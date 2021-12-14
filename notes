@@ -8,5 +8,20 @@ TOURS :			Tant que le joueur peux jouer et a envie de jouer :
 					Choisis si continue (si il peut) ou arrete son tour -> prend un Pikomino au centre du nb = total des
 																		-> prend un Pikomino adversaire du nb = total des
 																		-> prend un Pikmino de valeur de nb < total des
+DISPLAY : Met ajour la fenetre -> platequ de jeux / Question. 
+	display (t_data *data, int sate) -> state : 0 = Menu; 1 = Debut de partie, noms des joueurs; 2 = jeux
+typedef struct s_joueur =
+{
+	char	*name;
+	int		pikomino[16];
+	int		is_bot;
+}	t_joueur;
+
+typedef struct s_data = 
+{
+	int			nb_players;
+	t_joueur	*players;
+	int		pikomino[16];
+}	t_data;
 
 
