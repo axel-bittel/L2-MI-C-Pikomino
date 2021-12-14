@@ -1,0 +1,12 @@
+
+INIT_GAME :		Demande noms et nombre de joueurs -> creer structure t_data
+LANCE_PARTIE :	Tant que pikomino sur le centre du jeux
+					Lance un tour pour chaque joueurs
+TOURS :			Tant que le joueur peux jouer et a envie de jouer :
+					Lance les des
+					Choisis ce qu'il veux prendre
+					Choisis si continue (si il peut) ou arrete son tour -> prend un Pikomino au centre du nb = total des
+																		-> prend un Pikomino adversaire du nb = total des
+																		-> prend un Pikmino de valeur de nb < total des
+
+
