@@ -20,6 +20,7 @@ typedef struct s_joueur =
 typedef struct s_data = 
 {
 	int			nb_players;
+	int			des[8];
 	t_joueur	*players;
 	int		pikomino[16];
 }	t_data;
