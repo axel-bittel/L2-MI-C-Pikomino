@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2021/12/24 16:48:14 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/10 14:51:39 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -233,23 +233,48 @@ int	get_pts(int val)
 	return (0);
 }
 
+void	print_des (t_data *data)
+{
+	int		i;
+	char	inter;
+
+	i = -1;
+	while (++i < 8)
+	{
+		if (!data->des[i])
+			continue ;
+		inter = data->des[i] + 48;
+		write (1, "[", 1);
+		if (data->des[i] == 6)
+			write (1, "V", 1);
+		else
+			write (1, &inter, 1);
+		write (1, "] ", 1);
+	}
+}
+
 void	print_table (t_data *data)
 {
-	int	i;
-	int	**screen;
+	int		i;
+	int		**screen;
 
 	i = -1;
 	screen = get_blank_screen(150, 30);
-
 	//ptint table
 	print_in_screen (screen, get_blank_screen(100, 15), 25, 8);
+	//print players
+	print_str_in_screen (screen, data->players[0].name, 25, 2);
+	print_str_in_screen (screen, data->players[1].name, 55, 2);
+	print_str_in_screen (screen, data->players[2].name, 85, 2);
+	print_str_in_screen (screen, data->players[3].name, 115, 2);
 	//print pikomino
 	while (++i < 16)
 		if (data->pikomino[i] != -1)
 			print_in_screen(screen, get_pikomino(data->pikomino[i], get_pts(data->pikomino[i])), 22 + (i + 1) * 6, 12);
 	//print screen final
 	print_screen (screen);
-
+	print_des (data);
+	write (1, "\n", 1);
 }
 
 void	init_data(t_data *data)
@@ -258,14 +283,14 @@ void	init_data(t_data *data)
 	int	j;
 
 	i = -1;
-	j = -1;
 	data->nb_players = 7;
 	data->players = malloc (sizeof (t_joueur) * data->nb_players);
-	while (++i < 7)
+	while (++i < data->nb_players)
 	{
+		j = -1;
 		data->players[i].name = malloc (sizeof(char ) * 11);
 		while (++j < 10)
-			data->players[i].name[j] = i + 48;
+			data->players[i].name[j] = i + 1 + 48;
 		data->players[i].name[10] = 0; 
 		data->players[i].pikomino = malloc(sizeof(int) * 16);
 		data->players[i].pikomino[0] = 0; 
@@ -274,15 +299,13 @@ void	init_data(t_data *data)
 	i = -1;
 	while (++i < 16)
 		data->pikomino[i] = i + 21;
+	i = -1;
+	while (++i < 8)
+		data->des[i] = 0;
 }
 
 int	main(int argc, char **argv)
 {
-	/*printf("Enter nb :");
-	scanf("%d", &i);
-	clearScreen();
-	printf ("nb is %d\n", i);
-	*/
 	t_data	data;
 	clearScreen();
 	init_data(&data);
