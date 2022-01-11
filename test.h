@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 14:58:25 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/11 10:16:52 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/11 10:53:26 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 typedef struct s_joueur 
 {
 	char	*name;
-	int		*pikomino;
+	int		pikomino[16];
 	int		is_bot;
 }	t_joueur;
 

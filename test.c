@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/11 10:15:27 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/11 12:03:32 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include "test.h"
 
+//***************************************************************************
+//#PRINT#
+//***************************************************************************
 void	clearScreen(void)
 {
 	#if defined(__linux__) || defined(__unix__) || defined(__APPLE__)
@@ -302,7 +305,9 @@ void	print_playerboard (t_data *data)
 	free_screen (screen);
 	write (1, "\n", 1);
 }
-
+//***************************************************************************yy
+//#DATA_MANAGEMENT#
+//***************************************************************************yy
 void	init_data(t_data *data)
 {
 	int	i;
@@ -318,7 +323,6 @@ void	init_data(t_data *data)
 		while (++j < 10)
 			data->players[i].name[j] = i + 1 + 48;
 		data->players[i].name[10] = 0; 
-		data->players[i].pikomino = malloc(sizeof(int) * 16);
 		data->players[i].pikomino[0] = 0; 
 		data->players[i].is_bot = 1; 
 	}
@@ -334,6 +338,38 @@ int	get_fst_pikomino (t_data *data, int player)
 {
 	int	*tab;
 	int	i;
+
+	if (player == -1)
+		tab = data->pikomino;
+	else
+		tab = data->players[player].pikomino;
+	i = -1;
+	while (++i < 16)
+		if (tab[i] != -1)
+			return (tab[i]);
+	return (-1);
+}
+
+int	get_lst_pikomino (t_data *data, int player)
+{
+	int	*tab;
+	int	i;
+
+	if (player == -1)
+		tab = data->pikomino;
+	else
+		tab = data->players[player].pikomino;
+	i = -1;
+	while (++i < 16)
+		if (tab[i] != -1)
+			return (tab[i]);
+	return (-1);
+}
+
+int	get_max_pikomino (t_data *data, int player)
+{
+	int	*tab;
+	int	i;
 	int	res;
 
 	if (player == -1)
@@ -341,12 +377,111 @@ int	get_fst_pikomino (t_data *data, int player)
 	else
 		tab = data->players[player].pikomino;
 	i = -1;
-	while (tab[++i] > -1);
-	if (i && tab[i - 1] > -1)
-		return (tab[i - 1]);
+	res = tab[0];
+	while (++i < 16)
+		if (tab[i] > res)
+			res = tab[i];
+	return (res);
+}
+
+int	pop (int *tab)
+{
+	int	i;
+	int	res;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (tab[i] == -1 && i)
+		{
+			res = tab[i - 1];
+			tab[i - 1] = -1;
+			return (res);
+		}
+		else if (tab[i] == -1)
+			return (-1);
+	}
+}
+
+int	pop_elem (int *tab, int val)
+{
+	int	i;
+	int	j;
+	int	res;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (tab[i] == val)
+		{
+			j = i;
+			while (++j < 16)
+				tab[j - 1] = tab[j];
+			return (val);
+		}
+	}
+	tab[15] = -1; 
 	return (-1);
 }
 
+int	push_elem (int *tab, int val)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (tab[i] == -1)
+		{
+			tab[i] = val;
+			return (1);
+		}
+	}
+	return (0);
+}
+
+int	replace_val (int *tab, int val, int replace)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (tab[i] == val)
+		{
+			tab[i] = replace;
+			return (i);
+		}
+	}
+	return (-1);
+}
+
+int	is_val_in (int *tab, int val)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (tab[i] == val)
+			return (1);
+	}
+	return (0);
+}
+
+int	get_joueur_is_val (t_data *data, int val)
+{
+	int	i;
+
+	i = -1;
+	while (++i < data->nb_players)
+		if (is_val_in (data->players[i].pikomino, val))
+				return (i);
+	return (-1);
+}
+//***************************************************************************
+//#GAME#
+//***************************************************************************
 int	is_end_game (t_data *data)
 {
 	if (get_fst_pikomino(data, -1) == -1)
@@ -354,16 +489,43 @@ int	is_end_game (t_data *data)
 	return (0);
 }
 
+void	tour_ratee (t_data *data, int player)
+{
+	int	inter;
+
+	write (1, "You fail your turn.\n", 20);
+	if ((inter = pop(data->players[player].pikomino)) != -1)
+	{
+		if (get_max_pikomino (data, -1) > inter)
+			replace_val (data->pikomino, get_max_pikomino(data, -1), 0);
+		push_elem (data->pikomino, inter);
+		write (1, "Vous avez perdu votre pikomino.", 31);
+	}
+}
+
+void	update_game (t_data *data, int player, int score)
+{
+	//TOUR RATE
+	if (!score)
+		tour_ratee (data, player);
+	else //TOUR REUSSI
+	{
+		if ()
+	}
+}
+
 void	lance_jeux (t_data *data)
 {
 	int	i;
+	int	score_inter;
 
 	while (!is_end_game(data))
 	{
 		i = -1;
 		while (++i < data->nb_players)
 		{
-			//lance_tour_player (data, i);
+			score_inter = 33;
+			update_game (data, i, score_inter);
 		}
 	}
 }
