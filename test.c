@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/10 19:47:17 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/11 10:15:27 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -278,7 +278,7 @@ void	print_table (t_data *data)
 	write (1, "\n", 1);
 }
 
-void	print_news (t_data *data)
+void	print_playerboard (t_data *data)
 {
 	int	i;
 	int		**screen;
@@ -330,12 +330,50 @@ void	init_data(t_data *data)
 		data->des[i] = 0;
 }
 
+int	get_fst_pikomino (t_data *data, int player)
+{
+	int	*tab;
+	int	i;
+	int	res;
+
+	if (player == -1)
+		tab = data->pikomino;
+	else
+		tab = data->players[player].pikomino;
+	i = -1;
+	while (tab[++i] > -1);
+	if (i && tab[i - 1] > -1)
+		return (tab[i - 1]);
+	return (-1);
+}
+
+int	is_end_game (t_data *data)
+{
+	if (get_fst_pikomino(data, -1) == -1)
+		return (1);
+	return (0);
+}
+
+void	lance_jeux (t_data *data)
+{
+	int	i;
+
+	while (!is_end_game(data))
+	{
+		i = -1;
+		while (++i < data->nb_players)
+		{
+			//lance_tour_player (data, i);
+		}
+	}
+}
+
 int	main(int argc, char **argv)
 {
 	t_data	data;
 	clearScreen();
 	init_data(&data);
-	print_table(&data);
-	//print_news (&data);
+	//print_table(&data);
+	print_playerboard (&data);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 14:58:25 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/10 19:40:07 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/11 10:16:52 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,5 +37,6 @@ int		**get_pikomino(int val, int pts);
 int		**get_blank_screen (int x, int y);
 int		get_yes_no(const char *str);
 void	clearScreen(void);
+int		ft_strlen(char *str);
 #endif
 
