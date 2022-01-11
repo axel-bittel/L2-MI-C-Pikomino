@@ -6,12 +6,13 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/10 14:51:39 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/10 19:47:17 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "test.h"
 
 void	clearScreen(void)
 {
@@ -56,21 +57,6 @@ int	get_yes_no(const char *str)
 	}
 	return (res == 'o');
 }
-
-typedef struct s_joueur 
-{
-	char	*name;
-	int		*pikomino;
-	int		is_bot;
-}	t_joueur;
-
-typedef struct s_data 
-{
-	int			nb_players;
-	int			des[8];
-	t_joueur	*players;
-	int			pikomino[16];
-}	t_data;
 
 int	ft_strlen(char *str)
 {
@@ -253,6 +239,16 @@ void	print_des (t_data *data)
 	}
 }
 
+void	free_screen (int **screen)
+{
+	int	i;
+
+	i = -1;
+	while (screen[++i])
+		free (screen[i]);
+	free (screen);
+}
+
 void	print_table (t_data *data)
 {
 	int		i;
@@ -263,17 +259,47 @@ void	print_table (t_data *data)
 	//ptint table
 	print_in_screen (screen, get_blank_screen(100, 15), 25, 8);
 	//print players
-	print_str_in_screen (screen, data->players[0].name, 25, 2);
-	print_str_in_screen (screen, data->players[1].name, 55, 2);
-	print_str_in_screen (screen, data->players[2].name, 85, 2);
-	print_str_in_screen (screen, data->players[3].name, 115, 2);
+	while (++i < 4)
+		if (i < data->nb_players)
+			print_str_in_screen (screen, data->players[i].name, 25 + i * 30, 2);
+	i = 4;
+	while (++i < 7)
+		if (i < data->nb_players)
+			print_str_in_screen (screen, data->players[i].name, 25 + (i - 4) * 30, 24);
 	//print pikomino
+	i = -1;
 	while (++i < 16)
 		if (data->pikomino[i] != -1)
 			print_in_screen(screen, get_pikomino(data->pikomino[i], get_pts(data->pikomino[i])), 22 + (i + 1) * 6, 12);
 	//print screen final
 	print_screen (screen);
 	print_des (data);
+	free_screen (screen);
+	write (1, "\n", 1);
+}
+
+void	print_news (t_data *data)
+{
+	int	i;
+	int		**screen;
+
+	i = -1;
+	screen = get_blank_screen(150, 30);
+	print_str_in_screen (screen, "PLAYER BOARD : ", 1, 1);
+	while (++i < data->nb_players)
+	{
+		if (data->players[i].name)
+		{
+			print_str_in_screen (screen, "player ", 3, i + 3 + (i * 3));
+			screen[i + 3 + (i * 3)][10] = (i + 1) + 48;
+			screen[i + 3 + (i * 3)][11] = ':';
+			print_str_in_screen (screen, data->players[i].name, 13 , i + 3 + (i * 3));
+			if (data->players[i].is_bot)
+				print_str_in_screen (screen, "[ BOT ]", 14 + ft_strlen(data->players[i].name) , i + 3 + (i * 3));
+		}
+	}
+	print_screen (screen);
+	free_screen (screen);
 	write (1, "\n", 1);
 }
 
@@ -294,7 +320,7 @@ void	init_data(t_data *data)
 		data->players[i].name[10] = 0; 
 		data->players[i].pikomino = malloc(sizeof(int) * 16);
 		data->players[i].pikomino[0] = 0; 
-		data->players[i].is_bot = 0; 
+		data->players[i].is_bot = 1; 
 	}
 	i = -1;
 	while (++i < 16)
@@ -310,5 +336,6 @@ int	main(int argc, char **argv)
 	clearScreen();
 	init_data(&data);
 	print_table(&data);
+	//print_news (&data);
 	return (0);
 }
