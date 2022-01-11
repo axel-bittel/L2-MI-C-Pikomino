@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/11 12:03:32 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/11 16:43:55 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -25,6 +25,11 @@ void	clearScreen(void)
     #if defined(_WIN32) || defined(_WIN64)
         system("cls");
     #endif
+}
+
+void	fill_out_stdin(void)
+{
+	while (fgetc( stdin ) != '\n');
 }
 
 void	print_pikomino(int val, int pts)
@@ -48,13 +53,12 @@ int	get_yes_no(const char *str)
 	res = 0;
 	while (!res)
 	{
-		printf ("\n%s (o/n) : ", str);
+		printf ("%s (o/n) : ", str);
 		scanf ("%c", &res);
-		printf ("\n");
+		fill_out_stdin();
 		if (res != 'o' && res != 'n')
 		{
-			printf ("Mauvaise entre, veuillez entrer oui ou non.\n");
-			scanf ("%c", &res);
+			printf ("Mauvaise entre, veuillez entrer o ou n.\n");
 			res = 0;
 		}
 	}
@@ -70,13 +74,13 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
-char	*ft_strdup_int(char *str)
+char	*ft_strdup(const char *str)
 {
 	int		i;
 	char	*res;
 
 	i = -1;
-	res = malloc (sizeof(char) * (ft_strlen(str) + 1));
+	res = malloc (sizeof(char) * (ft_strlen((char *)str) + 1));
 	while (str[++i])
 		res[i] = str[i];
 	res[i] = 0;
@@ -135,10 +139,10 @@ int	**get_pikomino(int val, int pts)
 	pik_res[1][3] = (int)('│');
 	pik_res[1][4] = 0;
 	pik_res[2] = malloc (sizeof(int) * 5);
-	pik_res[2][0] = (int)('├');
-	pik_res[2][1] = (int)('─');
-	pik_res[2][2] = (int)('─');
-	pik_res[2][3] = (int)('┤');
+	pik_res[2][0] = val ? (int)('├') : (int)('│');
+	pik_res[2][1] = val ? (int)('─') : (int)(' ');
+	pik_res[2][2] = val ? (int)('─') : (int)(' ');
+	pik_res[2][3] = val ? (int)('┤') : (int)('│');
 	pik_res[2][4] = 0;
 	pik_res[3] = malloc (sizeof(int) * 5);
 	pik_res[3][0] = (int)('│');
@@ -152,9 +156,12 @@ int	**get_pikomino(int val, int pts)
 	pik_res[4][2] = (int)('─');
 	pik_res[4][3] = (int)('┘');
 	pik_res[4][4] = 0;
-	pik_res[1][1] = val / 10 + 48;
-	pik_res[1][2] = (val % 10) + 48;
-	pik_res[3][2] = (pts % 10) + 48;
+	if (val)
+	{
+		pik_res[1][1] = val / 10 + 48;
+		pik_res[1][2] = (val % 10) + 48;
+		pik_res[3][2] = (pts % 10) + 48;
+	}
 	pik_res[5] = NULL;
 	return (pik_res);
 }
@@ -209,19 +216,6 @@ void	print_screen (int	**screen)
 	}
 }
 
-int	get_pts(int val)
-{
-	if (val >= 21 && val <= 24)
-		return (1);
-	else if (val >= 25 && val <= 28)
-		return (2);
-	else if (val >= 29 && val <= 32)
-		return (3);
-	else if (val >= 33 && val <= 36)
-		return (4);
-	return (0);
-}
-
 void	print_des (t_data *data)
 {
 	int		i;
@@ -263,12 +257,22 @@ void	print_table (t_data *data)
 	print_in_screen (screen, get_blank_screen(100, 15), 25, 8);
 	//print players
 	while (++i < 4)
+	{
 		if (i < data->nb_players)
-			print_str_in_screen (screen, data->players[i].name, 25 + i * 30, 2);
+		{
+			print_str_in_screen (screen,  data->players[i].name, 25 + i * 30, 2);
+			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + i * 30, 3);
+		}
+	}
 	i = 4;
 	while (++i < 7)
+	{
 		if (i < data->nb_players)
-			print_str_in_screen (screen, data->players[i].name, 25 + (i - 4) * 30, 24);
+		{
+			print_str_in_screen (screen, data->players[i].name, 25 + (i - 4) * 30, 23);
+			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + (i - 4) * 30, 24);
+		}
+	}
 	//print pikomino
 	i = -1;
 	while (++i < 16)
@@ -308,7 +312,7 @@ void	print_playerboard (t_data *data)
 //***************************************************************************yy
 //#DATA_MANAGEMENT#
 //***************************************************************************yy
-void	init_data(t_data *data)
+/*void	init_data(t_data *data)
 {
 	int	i;
 	int	j;
@@ -332,6 +336,77 @@ void	init_data(t_data *data)
 	i = -1;
 	while (++i < 8)
 		data->des[i] = 0;
+}*/
+
+void    init_joueur (t_joueur *joueur, t_data *data, int player) 
+{
+    char str1[] = "Etes-vous un humain ?";
+    char *str2 = malloc (sizeof(char) * 13);
+    const char *str[] = {"S.Veil" ,"N.Mandela", "Ghandhi", "M.L.King", "M.Debre" ,"R.Badinter", "G.Cantor"} ;
+    int i = 0 ;
+    int j = -1 ;
+    if (get_yes_no(str1) == 1) 
+    {
+        do 
+        {
+			printf ("Entrez votre nom : ");
+            scanf ("%s", str2); 
+			fill_out_stdin();
+			str2[12] = 0;
+            if (ft_strlen(str2) <= 10)
+                joueur->name = ft_strdup(str2) ;
+            else 
+                printf ("Veuillez entrez un nom d'au maximum 10 lettres \n") ;
+        } while (ft_strlen(str2) > 10) ;
+        joueur->is_bot = 0 ;
+        i += 1 ;
+        while (++j < 16) 
+            joueur->pikomino[j] = -1 ;
+    }
+    else 
+    { 
+        joueur->name = ft_strdup(str[player]) ; 
+        joueur->is_bot = 1 ;
+        while (++j < 16) 
+            joueur->pikomino[j] = -1 ;
+    }
+	free (str2);
+	clearScreen();
+	print_playerboard (data);
+}
+
+
+void    init_data (t_data *data) 
+{
+    char str2[] = "A combien de joueur voulez-vous jouer ? \nDonnez un chiffre entre 2 et 7 inclus" ;
+    int n ;
+    int i = -1 ;
+    int j = -1 ;
+    int k = -1 ;
+
+	print_playerboard (data);
+    do 
+    {
+        printf("%s : ", str2);
+        scanf("%d", &n);
+		fill_out_stdin();
+        if ( (n < 2) || (n > 7) )
+            printf("Vous devez être au moins deux et au maximum 7 pour démarrer une partie, avec ou sans bot. \n") ;
+        else 
+        {
+            data->nb_players = n ;
+            data->players = malloc (sizeof (t_joueur) * data->nb_players) ;
+            while (++i < data->nb_players)
+				data->players[i].name = 0;
+			i = -1;
+            while (++i < data->nb_players)
+                init_joueur (data->players + i, data, i) ;
+            while (++j < 8)
+                data->des[j] = 0 ;
+            while (++k < 16)
+                data->pikomino[k] = 21 + k;
+        }
+    } while ((n < 2) || (n > 7)) ;
 }
 
 int	get_fst_pikomino (t_data *data, int player)
@@ -360,10 +435,10 @@ int	get_lst_pikomino (t_data *data, int player)
 	else
 		tab = data->players[player].pikomino;
 	i = -1;
-	while (++i < 16)
-		if (tab[i] != -1)
-			return (tab[i]);
-	return (-1);
+	while (++i < 15)
+		if (tab[i + 1] == -1)
+			return (i);
+	return (i);
 }
 
 int	get_max_pikomino (t_data *data, int player)
@@ -469,19 +544,46 @@ int	is_val_in (int *tab, int val)
 	return (0);
 }
 
-int	get_joueur_is_val (t_data *data, int val)
+int	get_joueur_has_val (t_data *data, int val)
 {
 	int	i;
 
 	i = -1;
 	while (++i < data->nb_players)
-		if (is_val_in (data->players[i].pikomino, val))
+		if (get_lst_pikomino (data, i) == val)
 				return (i);
+	if (is_val_in(data->pikomino, val))
+		return (-1);
+	return (-2);
+}
+
+int	is_table_has_less (t_data *data, int score)
+{
+	while (score >= 21)
+	{
+		if (is_val_in(data->pikomino, score))
+			return (score);
+		score--;
+	}
 	return (-1);
 }
 //***************************************************************************
 //#GAME#
 //***************************************************************************
+
+int	get_pts(int val)
+{
+	if (val >= 21 && val <= 24)
+		return (1);
+	else if (val >= 25 && val <= 28)
+		return (2);
+	else if (val >= 29 && val <= 32)
+		return (3);
+	else if (val >= 33 && val <= 36)
+		return (4);
+	return (0);
+}
+
 int	is_end_game (t_data *data)
 {
 	if (get_fst_pikomino(data, -1) == -1)
@@ -499,7 +601,7 @@ void	tour_ratee (t_data *data, int player)
 		if (get_max_pikomino (data, -1) > inter)
 			replace_val (data->pikomino, get_max_pikomino(data, -1), 0);
 		push_elem (data->pikomino, inter);
-		write (1, "Vous avez perdu votre pikomino.", 31);
+		write (1, "You loose your pikomino.", 31);
 	}
 }
 
@@ -510,7 +612,21 @@ void	update_game (t_data *data, int player, int score)
 		tour_ratee (data, player);
 	else //TOUR REUSSI
 	{
-		if ()
+		if (get_joueur_has_val(data, score) == -2 && is_table_has_less(data, score) == -1)
+			tour_ratee (data, player);
+		else //SI PEUX PRENDRE UN PIKOMINO 
+		{
+			if (get_joueur_has_val(data, score) && get_yes_no("Do you want steal pikomino ?"))
+			{
+				push_elem (data->players[player].pikomino, score);
+				pop_elem (data->players[get_joueur_has_val(data, score)].pikomino, score);
+			}
+			else if (is_table_has_less(data, score))
+			{
+				push_elem (data->players[player].pikomino, score);
+				pop_elem (data->pikomino, score);
+			}
+		}
 	}
 }
 
@@ -526,6 +642,8 @@ void	lance_jeux (t_data *data)
 		{
 			score_inter = 33;
 			update_game (data, i, score_inter);
+			clearScreen();
+			print_table(data);
 		}
 	}
 }
@@ -535,7 +653,7 @@ int	main(int argc, char **argv)
 	t_data	data;
 	clearScreen();
 	init_data(&data);
-	//print_table(&data);
-	print_playerboard (&data);
+	clearScreen();
+	print_table(&data);
 	return (0);
 }

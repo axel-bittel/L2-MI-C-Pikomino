@@ -9,7 +9,6 @@ void    init_joueur (t_joueur *joueur)
     const char *str[] = {"S.Veil" ; "N.Mandela"; "Ghandhi" ; "M.L.King" ; "M.Debre" ; "R.Badinter"} ;
     int i = 0 ;
     int j = -1 ;
-  
     if (get_yes_no(str1) == 1) 
     {
         do 
