@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/12 16:11:09 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/12 17:15:42 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -361,7 +361,7 @@ void    init_joueur (t_joueur *joueur, t_data *data, int player)
 {
     char str1[] = "Etes-vous un humain ?";
     char *str2 = malloc (sizeof(char) * 13);
-    const char *str[] = {"S.Veil" ,"N.Mandela", "Ghandhi", "M.L.King", "M.Debre" ,"R.Badinter", "G.Cantor"} ;
+    const char *str[] = {"S.Veil" , "D.Knuth", "M.Debre", "A.Lovelace", "G.Hopper", "Ghandhi", "N.Mandela"} ;
     int i = 0 ;
     int j = -1 ;
     if (get_yes_no(str1) == 1) 
@@ -657,7 +657,7 @@ int	is_value_in_dice(int *des, int value, int nb_dice)
 int score_des (t_data *data, int player)
 {
 	int i = -1 ;
-	int n = 0;										/* Valeur dé que joueur veut garder                                                        */
+	int n = 0;									/* Valeur dé que joueur veut garder                                                        */
 	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
 	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
 	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
