@@ -70,26 +70,26 @@ void    init_data (t_data *data)
 
 int score_des (t_data *data, int player )
 {
-    int score ;                  /* Score à retourner                                                                       */
-    int possibilites ;           /* Vaut 0 si plus de possibilités de jouer, 1 sinon                                        */
-    int nbr_des = 8 ;            /* Nombre dés à lancer                                                                     */
-    int nbr_lancers = 0 ;        /* Nombre de lancers effectués et ayant aboutis                                            */
-    int n ;                      /* Valeur dé que joueur veut garder                                                        */
-    int cpt = 0 ;                /* Compteur                                                                                */
+    int score ;                          /* Score à retourner                                                                       */
+    int possibilites = 5 ;               /* Nombre valeurs déja prises pour les dés                                                 */
+    int nbr_des = 8 ;                    /* Nombre dés à lancer                                                                     */
+    int nbr_lancers = 0 ;                /* Nombre de lancers effectués et ayant aboutis                                            */
+    int n ;                              /* Valeur dé que joueur veut garder                                                        */
+    int cpt = 0 ;                        /* Compteur                                                                                */
     int i = -1 ;
-    int valeurs[6] = {-1};       /* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
+    int valeurs[6] = {-1};               /* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
     char str[] = "Voulez-vous relancer les dés ?" ;
 
     do
     {
-        if (nbr_lancers == 0)    /* cas du premier lancer                                                                   */
+        if (nbr_lancers == 0)            /* cas du premier lancer                                                                   */
         {
             while (++i < 9)
                 data->des[i] = (rand(void) % 6) ;
             printf("Quels dés voulez-vous garder ? \n") ;
             scanf("Entrez la valeur : %d", &n ) ;
-            fill_out_stdin(void)
-            i = -1;
+            fill_out_stdin(void) ;
+            i = -1 ;
             while (++i < 9) 
                 {
                     if (data->des[i] = n )
@@ -103,42 +103,65 @@ int score_des (t_data *data, int player )
                 valeurs[n] = cpt ; 
         } 
         else 
-
-            if (get_yes_no(str) == 1)
+        {
+            if (get_yes_no(str) == 1)    /* Si le joueur n'en est pas à son premier lancer, et qu'il veut lancer les dés             */
             {
                 i = -1 ;
                 cpt = 0 ;
                 while (++i < (nbr_des+1))
                     data->des[i] = (rand(void) % 6) ;
-                printf("Quels dés voulez-vous garder ? \n") ;
-                scanf("Entrez la valeur : %d", &n ) ;
-                fill_out_stdin(void)
-                i = -1;
-                while (++i < 9) 
+                i = -1 ;
+                while (++i < 6)
+                {
+                    if (valeurs[i] != -1)
+                        possibilites -= 1 ; 
+                   
+                }
+                if (possibilites != 0) 
+                {
+                    printf("Quels dés voulez-vous garder ? \n") ;
+                    scanf("Entrez la valeur : %d", &n ) ;
+                    fill_out_stdin(void) ;
+                    i = -1 ;
+                    while (++i < 9) 
                     {
                         if (valeurs[n] == -1)
                         {
                             if (data->des[i] = n )
-                                cpt += 1;
+                                cpt += 1 ;
                         }
                         else 
                             break ;
                     }
-                if (cpt == 0) 
-                    printf("Vous ne disposez pas de cette valeur, veuillez en choisir une delivrée par les dés que vous n'avez pas déjà gardée") ;
-                else
-                    nbr_des -= cpt ;
-                    nbr_lancers += 1 ;
-                    valeurs[n] = cpt ;
+                    if (cpt == 0) 
+                        printf("Vous ne disposez pas de cette valeur, veuillez en choisir une delivrée par les dés que vous n'avez pas déjà gardée") ;
+                    else
+                    {
+                        nbr_des -= cpt ;
+                        nbr_lancers += 1 ;
+                        valeurs[n] = cpt ;
+                    }
+                }
+                else 
+                    break ;
             } 
             else 
-                nbr_lancers = 1 ;
-                possibilites = 0 ; 
+                break ; 
         }
-    } while ( (nbr_lancers == 0) || (possibilites != 0) ) 
+    } while ( (nbr_lancers == 0) || (possibilites != 0) || (get_yes_no(str)) ) 
 
     i = -1 ;
-    if ((valeurs[0] = -1) 
+    if ((valeurs[0] = -1) ||(possibilites == 0)) 
         score = 0 ;
-    
+    else 
+    {
+        i = 0 ;
+        score += valeurs[i] * 5          /* La face V du dé est représentée par la valeur 0, or elle vaut (en score) 5 points        */
+        while (++i < 6)
+        {
+            if (valeurs[i] != -1)
+                score += i * valeurs[i] ;
+        }
+    }
+    return (score) ;
 }
