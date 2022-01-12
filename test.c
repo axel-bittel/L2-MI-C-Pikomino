@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/12 10:55:39 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/12 16:11:09 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -218,24 +218,47 @@ void	print_screen (int	**screen)
 	}
 }
 
-void	print_des (t_data *data)
+void	print_des (t_data *data, int nbr_des, int *valeurs)
 {
 	int		i;
+	int		j;
 	char	inter;
 
-	i = -1;
-	while (++i < 8)
+	if (data)
 	{
-		if (!data->des[i])
-			continue ;
-		inter = data->des[i] + 48;
-		write (1, "[", 1);
-		if (data->des[i] == 6)
-			write (1, "V", 1);
-		else
-			write (1, &inter, 1);
-		write (1, "] ", 1);
+		i = -1;
+		while (++i < nbr_des)
+		{
+			if (data->des[i] == -1)
+				continue ;
+			inter = data->des[i] + 48;
+			write (1, "[", 1);
+			if (data->des[i] == 0)
+				write (1, "V", 1);
+			else
+				write (1, &inter, 1);
+			write (1, "] ", 1);
+		}
+		write (1, "                              ", 30);
 	}
+	i = -1;
+	while (++i < 6)
+	{
+		j = -1;
+		if (valeurs[i] == -1)
+			continue ;
+		while (++j < valeurs[i])
+		{
+			inter = i + 48;
+			write (1, "[", 1);
+			if (i == 0)
+				write (1, "V", 1);
+			else
+				write (1, &inter, 1);
+			write (1, "] ", 1);
+		}
+	}
+	write (1, "\n", 1);
 }
 
 void	free_screen (int **screen)
@@ -266,8 +289,8 @@ void	print_table (t_data *data, int *score, int player)
 			if (i == player)
 			{
 				screen [2][25 + ft_strlen(data->players[i].name) + i * 30] = '[';
-				screen [2][25 + ft_strlen(data->players[i].name)+ i * 30] = '*';
-				screen [2][25 + ft_strlen(data->players[i].name)+ i * 30] = ']';
+				screen [2][26 + ft_strlen(data->players[i].name)+ i * 30] = '*';
+				screen [2][27 + ft_strlen(data->players[i].name)+ i * 30] = ']';
 			}
 			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + i * 30, 3);
 		}
@@ -281,8 +304,8 @@ void	print_table (t_data *data, int *score, int player)
 			if (i == player)
 			{
 				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = '[';
-				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = '*';
-				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = ']';
+				screen [23][26 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = '*';
+				screen [23][27 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = ']';
 			}
 			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + (i - 4) * 30, 24);
 		}
@@ -303,7 +326,6 @@ void	print_table (t_data *data, int *score, int player)
 		write (1, &d, 1);
 		write (1, "\n", 1);
 	}
-	print_des (data);
 	free_screen (screen);
 	write (1, "\n", 1);
 }
@@ -581,6 +603,115 @@ int	get_pts(int val)
 	return (0);
 }
 
+int	cumpute_score(int *valeurs)
+{
+	int	i;
+	int	score = 0;
+
+	i = -1;
+	score += valeurs[0] * 5;          /* La face V du dé est représentée par la valeur 0, or elle vaut (en score) 5 points        */
+	while (++i < 6)
+		if (valeurs[i] != -1)
+			score += i * valeurs[i];
+	return (score); 
+}
+
+void	get_new_dice(t_data *data, int nbr_des)
+{
+	int	i;
+
+	i = -1; 
+	while (++i < (nbr_des+1))
+		data->des[i] = (rand() % 6) ;
+}
+
+int	can_take_dice(int *valeurs, int *des, int nbr_des)
+{
+	int	i;
+
+	i = -1 ;
+	while (++i < nbr_des)
+		if (valeurs[des[i]] == -1)
+			break ;
+	if (i == nbr_des)
+		return (0);
+	else 
+		return (1);
+}
+
+int	is_value_in_dice(int *des, int value, int nb_dice)
+{
+	int	i;
+	int	cpt;
+
+	i = -1 ;
+	cpt = 0;
+	while (++i < nb_dice) 
+	{
+		if (des[i] == value)
+			cpt += 1;
+	}
+	return (cpt);
+}
+
+int score_des (t_data *data, int player)
+{
+	int i = -1 ;
+	int n = 0;										/* Valeur dé que joueur veut garder                                                        */
+	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
+	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
+	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
+	int valeurs[6] = {-1, -1, -1, -1, -1, -1};	/* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
+	char str[] = "Voulez-vous relancer les dés ?" ;
+
+	do
+	{
+		get_new_dice(data, nbr_des);
+		clearScreen();
+		print_table (data, 0, player);
+		printf ("%s :\n", data->players[player].name);
+		print_des(data, nbr_des, valeurs);
+		if (nbr_lancers)
+		{
+			i = -1 ;
+			possibilites = 6;
+			while (++i < 6)
+				if (valeurs[i] != -1)
+					possibilites -= 1; 
+		}
+		if (possibilites) 
+		{
+			int	err;
+			do {
+				err = 0;
+				if (!can_take_dice(valeurs, data->des, nbr_des))
+					return (0);
+				printf("\nQuels dés voulez-vous garder ? \n") ;
+				printf("Entrez la valeur : ") ;
+				scanf("%c", (char *)&n ) ;
+				n = (n == 'V') ? 0 : n - 48;
+				fill_out_stdin() ;
+				if (!is_value_in_dice(data->des, n, nbr_des))
+					err = printf("Vous ne disposez pas de cette valeur, veuillez en choisir une delivrée par les dés\n") ;
+				else if (valeurs[n] != -1)
+					err = printf("Vous avez deja pris cette valeur, veuillez en choisir une autre\n") ;
+				else
+				{
+					valeurs[n] = is_value_in_dice(data->des, n, nbr_des); 
+					nbr_des -= is_value_in_dice(data->des, n, nbr_des);
+					nbr_lancers++;
+				}
+			} while (err);
+			clearScreen();
+			print_table (data, 0, player);
+			print_des(0, nbr_des, valeurs);
+		} 
+	} while (possibilites && get_yes_no(str)); 
+	if ((valeurs[0] == -1)) 
+		return (0);
+	return (cumpute_score(valeurs));
+}
+
 int	is_end_game (t_data *data)
 {
 	int	i;
@@ -588,7 +719,7 @@ int	is_end_game (t_data *data)
 	i = -1;
 	while (++i < 16)
 		if (data->pikomino[i] != -1 && data->pikomino[i] != 0)
-				return (i);
+			return (i);
 	return (1);
 }
 
@@ -596,20 +727,24 @@ void	tour_ratee (t_data *data, int player, int score)
 {
 	int	inter;
 
-	print_table(data, &score, player);
-	write (1, "You fail your turn.\n", 20);
 	if ((inter = pop(data->players[player].pikomino)) != -1)
 	{
 		if (get_max_pikomino (data, -1) > inter)
 			replace_val (data->pikomino, get_max_pikomino(data, -1), 0);
 		push_elem (data->pikomino, inter);
-		write (1, "You loose your pikomino.", 31);
 	}
+	write (1, "You fail your turn.\n", 20);
+	clearScreen();
+	print_table(data, &score, player);
+	if (inter == -1)
+		write (1, "You loose your pikomino.", 31);
 }
 
 void	update_game (t_data *data, int player, int score)
 {
 	//TOUR RATE
+	clearScreen ();
+	print_table(data, &score, player);
 	if (!score)
 		tour_ratee (data, player, score);
 	else //TOUR REUSSI
@@ -622,6 +757,7 @@ void	update_game (t_data *data, int player, int score)
 			{
 				push_elem (data->players[player].pikomino, score);
 				pop_elem (data->players[get_joueur_has_val(data, score)].pikomino, score);
+				clearScreen ();
 				print_table(data, &score, player);
 				write (1, "You steal a pikomino to your opponent\n", 38);
 			}
@@ -629,8 +765,9 @@ void	update_game (t_data *data, int player, int score)
 			{
 				push_elem (data->players[player].pikomino, is_table_has_less(data, score));
 				pop_elem (data->pikomino, is_table_has_less(data, score));
+				clearScreen ();
 				print_table(data, &score, player);
-				write (1, "You get a pikomino\n", 18);
+				write (1, "You get a pikomino\n", 19);
 			}
 		}
 	}
@@ -646,9 +783,10 @@ void	lance_jeux (t_data *data)
 		i = -1;
 		while (++i < data->nb_players)
 		{
-			score_inter = rand() % 16 + 21;
+			score_inter = score_des (data, i);
 			update_game (data, i, score_inter);
-			scanf ("Fin du tour, appuyez sur une touche");
+			printf ("Fin du tour, appuyez sur ENTER\n");
+			while (getchar() != '\n');
 			fill_out_stdin();
 		}
 	}
