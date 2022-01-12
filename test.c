@@ -657,7 +657,7 @@ int	is_value_in_dice(int *des, int value, int nb_dice)
 int score_des (t_data *data, int player)
 {
 	int i = -1 ;
-	int n = 0;										/* Valeur dé que joueur veut garder                                                        */
+	int n = 0;								    /* Valeur dé que joueur veut garder                                                        */
 	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
 	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
 	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
