@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 14:58:25 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/11 16:33:44 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/12 10:34:03 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ typedef struct s_data
 	t_joueur	*players;
 	int			pikomino[16];
 }	t_data;
-void	print_table (t_data *data);
+void	print_table (t_data *data, int *score, int player);
 void	print_des (t_data *data);
 int		get_pts(int val);
 void	print_screen (int	**screen);

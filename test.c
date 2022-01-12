@@ -6,12 +6,13 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/11 16:43:55 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/12 10:55:39 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "time.h"
 #include "test.h"
 
 //***************************************************************************
@@ -125,6 +126,7 @@ int	**get_pikomino(int val, int pts)
 {
 	int	**pik_res;
 
+	val = val == -1 ? 0 : val;
 	pik_res = malloc (sizeof(int *) * 6);
 	pik_res[0] = malloc (sizeof(int) * 5);
 	pik_res[0][0] = (int)('┌');
@@ -246,7 +248,7 @@ void	free_screen (int **screen)
 	free (screen);
 }
 
-void	print_table (t_data *data)
+void	print_table (t_data *data, int *score, int player)
 {
 	int		i;
 	int		**screen;
@@ -261,6 +263,12 @@ void	print_table (t_data *data)
 		if (i < data->nb_players)
 		{
 			print_str_in_screen (screen,  data->players[i].name, 25 + i * 30, 2);
+			if (i == player)
+			{
+				screen [2][25 + ft_strlen(data->players[i].name) + i * 30] = '[';
+				screen [2][25 + ft_strlen(data->players[i].name)+ i * 30] = '*';
+				screen [2][25 + ft_strlen(data->players[i].name)+ i * 30] = ']';
+			}
 			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + i * 30, 3);
 		}
 	}
@@ -270,6 +278,12 @@ void	print_table (t_data *data)
 		if (i < data->nb_players)
 		{
 			print_str_in_screen (screen, data->players[i].name, 25 + (i - 4) * 30, 23);
+			if (i == player)
+			{
+				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = '[';
+				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = '*';
+				screen [23][25 + ft_strlen(data->players[i].name)+ (i - 4) * 30] = ']';
+			}
 			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + (i - 4) * 30, 24);
 		}
 	}
@@ -280,6 +294,15 @@ void	print_table (t_data *data)
 			print_in_screen(screen, get_pikomino(data->pikomino[i], get_pts(data->pikomino[i])), 22 + (i + 1) * 6, 12);
 	//print screen final
 	print_screen (screen);
+	if (score)
+	{
+		char	d = *score / 10 + 48;
+		write (1, "Score : ",8);
+		write (1, &d, 1);
+		d = *score % 10 + 48; 
+		write (1, &d, 1);
+		write (1, "\n", 1);
+	}
 	print_des (data);
 	free_screen (screen);
 	write (1, "\n", 1);
@@ -312,32 +335,6 @@ void	print_playerboard (t_data *data)
 //***************************************************************************yy
 //#DATA_MANAGEMENT#
 //***************************************************************************yy
-/*void	init_data(t_data *data)
-{
-	int	i;
-	int	j;
-
-	i = -1;
-	data->nb_players = 7;
-	data->players = malloc (sizeof (t_joueur) * data->nb_players);
-	while (++i < data->nb_players)
-	{
-		j = -1;
-		data->players[i].name = malloc (sizeof(char ) * 11);
-		while (++j < 10)
-			data->players[i].name[j] = i + 1 + 48;
-		data->players[i].name[10] = 0; 
-		data->players[i].pikomino[0] = 0; 
-		data->players[i].is_bot = 1; 
-	}
-	i = -1;
-	while (++i < 16)
-		data->pikomino[i] = i + 21;
-	i = -1;
-	while (++i < 8)
-		data->des[i] = 0;
-}*/
-
 void    init_joueur (t_joueur *joueur, t_data *data, int player) 
 {
     char str1[] = "Etes-vous un humain ?";
@@ -437,7 +434,7 @@ int	get_lst_pikomino (t_data *data, int player)
 	i = -1;
 	while (++i < 15)
 		if (tab[i + 1] == -1)
-			return (i);
+			return (tab[i]);
 	return (i);
 }
 
@@ -492,10 +489,10 @@ int	pop_elem (int *tab, int val)
 			j = i;
 			while (++j < 16)
 				tab[j - 1] = tab[j];
+			tab[15] = -1; 
 			return (val);
 		}
 	}
-	tab[15] = -1; 
 	return (-1);
 }
 
@@ -586,15 +583,20 @@ int	get_pts(int val)
 
 int	is_end_game (t_data *data)
 {
-	if (get_fst_pikomino(data, -1) == -1)
-		return (1);
-	return (0);
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+		if (data->pikomino[i] != -1 && data->pikomino[i] != 0)
+				return (i);
+	return (1);
 }
 
-void	tour_ratee (t_data *data, int player)
+void	tour_ratee (t_data *data, int player, int score)
 {
 	int	inter;
 
+	print_table(data, &score, player);
 	write (1, "You fail your turn.\n", 20);
 	if ((inter = pop(data->players[player].pikomino)) != -1)
 	{
@@ -609,22 +611,26 @@ void	update_game (t_data *data, int player, int score)
 {
 	//TOUR RATE
 	if (!score)
-		tour_ratee (data, player);
+		tour_ratee (data, player, score);
 	else //TOUR REUSSI
 	{
 		if (get_joueur_has_val(data, score) == -2 && is_table_has_less(data, score) == -1)
-			tour_ratee (data, player);
+			tour_ratee (data, player, score);
 		else //SI PEUX PRENDRE UN PIKOMINO 
 		{
-			if (get_joueur_has_val(data, score) && get_yes_no("Do you want steal pikomino ?"))
+			if (get_joueur_has_val(data, score) >= 0)
 			{
 				push_elem (data->players[player].pikomino, score);
 				pop_elem (data->players[get_joueur_has_val(data, score)].pikomino, score);
+				print_table(data, &score, player);
+				write (1, "You steal a pikomino to your opponent\n", 38);
 			}
 			else if (is_table_has_less(data, score))
 			{
-				push_elem (data->players[player].pikomino, score);
-				pop_elem (data->pikomino, score);
+				push_elem (data->players[player].pikomino, is_table_has_less(data, score));
+				pop_elem (data->pikomino, is_table_has_less(data, score));
+				print_table(data, &score, player);
+				write (1, "You get a pikomino\n", 18);
 			}
 		}
 	}
@@ -640,10 +646,10 @@ void	lance_jeux (t_data *data)
 		i = -1;
 		while (++i < data->nb_players)
 		{
-			score_inter = 33;
+			score_inter = rand() % 16 + 21;
 			update_game (data, i, score_inter);
-			clearScreen();
-			print_table(data);
+			scanf ("Fin du tour, appuyez sur une touche");
+			fill_out_stdin();
 		}
 	}
 }
@@ -651,9 +657,10 @@ void	lance_jeux (t_data *data)
 int	main(int argc, char **argv)
 {
 	t_data	data;
+	srand(time(NULL));
 	clearScreen();
 	init_data(&data);
 	clearScreen();
-	print_table(&data);
+	lance_jeux (&data);
 	return (0);
 }
