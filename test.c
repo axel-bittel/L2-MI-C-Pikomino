@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 18:10:49 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/13 18:15:12 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -897,6 +897,7 @@ int	load_game(t_data *data, char *name)
 	int		player;
 	FILE	*file;
 
+	data->name_game = name;
 	name = ft_strjoin(name, ".save");
 	file = fopen(name, "r");
 	if (!file)
@@ -904,7 +905,6 @@ int	load_game(t_data *data, char *name)
 		free (name);
 		return (-1);
 	}
-	data->name_game = name;
 	fscanf (file, "%d", &player);
 	fscanf (file, "%d", &data->nb_players);
 	data->players = malloc (sizeof(t_joueur) * data->nb_players);
