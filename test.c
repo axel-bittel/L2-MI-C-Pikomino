@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 17:38:14 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/13 18:10:49 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -77,8 +77,8 @@ int	ft_strlen(char *str)
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	int		i;
-	int		j;
+	int	i;
+	int	j;
 	char	*res;
 
 	i = -1;
@@ -127,17 +127,17 @@ long long	**get_blank_screen (int x, int y)
 		{
 			res[i][j] = ' ';
 			if (!i && !j)
-				res[i][j] = '┌';
+				res[i][j] = 14849164;
 			else if (!i && j == (x - 1))
-				res[i][j] = '┐';
+				res[i][j] = 14849168;
 			else if (i == (y - 1) && j == (x - 1))
-				res[i][j] = '┘'; 
+				res[i][j] = 14849176; 
 			else if (i == (y - 1) && !j)
-				res[i][j] = '└'; 
+				res[i][j] = 14849172; 
 			else if (!i || i == (y - 1))
-				res[i][j] = '─';
+				res[i][j] = 14849152;
 			else if (!j || j == (x - 1))
-				res[i][j] = '│';
+				res[i][j] = 14849154;
 		}
 	}
 	return (res);
@@ -150,34 +150,34 @@ long long	**get_pikomino(int val, int pts)
 	val = val == -1 ? 0 : val;
 	pik_res = malloc (sizeof(long long *) * 6);
 	pik_res[0] = malloc (sizeof(long long) * 5);
-	pik_res[0][0] = (long long)('┌');
-	pik_res[0][1] = (long long)('─');
-	pik_res[0][2] = (long long)('─');
-	pik_res[0][3] = (long long)('┐');
+	pik_res[0][0] = 14849164;
+	pik_res[0][1] = 14849152;
+	pik_res[0][2] = 14849152;
+	pik_res[0][3] = 14849168;
 	pik_res[0][4] = 0;
 	pik_res[1] = malloc (sizeof(long long) * 5);
-	pik_res[1][0] = (long long)('│');
+	pik_res[1][0] = 14849154;
 	pik_res[1][1] = (long long)(' ');
 	pik_res[1][2] = (long long)(' ');
-	pik_res[1][3] = (long long)('│');
+	pik_res[1][3] = 14849154;
 	pik_res[1][4] = 0;
 	pik_res[2] = malloc (sizeof(long long) * 5);
-	pik_res[2][0] = val ? (long long)('├') : (long long)('│');
-	pik_res[2][1] = val ? (long long)('─') : (long long)(' ');
-	pik_res[2][2] = val ? (long long)('─') : (long long)(' ');
-	pik_res[2][3] = val ? (long long)('┤') : (long long)('│');
+	pik_res[2][0] = val ? 14849180 : 14849154;
+	pik_res[2][1] = val ? 14849152 : (long long)(' ');
+	pik_res[2][2] = val ? 14849152 : (long long)(' ');
+	pik_res[2][3] = val ? 14849188 : 14849154;
 	pik_res[2][4] = 0;
 	pik_res[3] = malloc (sizeof(long long) * 5);
-	pik_res[3][0] = (long long)('│');
+	pik_res[3][0] = 14849154;
 	pik_res[3][1] = (long long)(' ');
 	pik_res[3][2] = (long long)(' ');
-	pik_res[3][3] = (long long)('│');
+	pik_res[3][3] = 14849154;
 	pik_res[3][4] = 0;
 	pik_res[4] = malloc (sizeof(long long) * 5);
-	pik_res[4][0] = (long long)('└');
-	pik_res[4][1] = (long long)('─');
-	pik_res[4][2] = (long long)('─');
-	pik_res[4][3] = (long long)('┘');
+	pik_res[4][0] = 14849172;
+	pik_res[4][1] = 14849152;
+	pik_res[4][2] = 14849152;
+	pik_res[4][3] = 14849176;
 	pik_res[4][4] = 0;
 	if (val)
 	{
@@ -391,7 +391,7 @@ void	print_score (t_data *data, int winner)
 	long long	**screen;
 
 	i = -1;
-	screen = get_blank_screen(150, 50);
+	screen = get_blank_screen(150, 43);
 	print_str_in_screen (screen, "SCORE : ", 1, 1);
 	while (++i < data->nb_players)
 	{
@@ -401,7 +401,7 @@ void	print_score (t_data *data, int winner)
 			j = -1;
 			while (++j < 16)
 				if (data->players[i].pikomino[j] != -1)
-					print_in_screen(screen, get_pikomino(data->players[i].pikomino[j], get_pts(data->players[i].pikomino[j])), 4 + ft_strlen(data->players[i].name) + (j + 1) * 6, i + 1  + (i * 5));
+					print_in_screen(screen, get_pikomino(data->players[i].pikomino[j], get_pts(data->players[i].pikomino[j])), 4 + 10 + (j + 1) * 6, i + 1  + (i * 5));
 		}
 	}
 	print_screen (screen);
@@ -461,7 +461,7 @@ void    init_data (t_data *data)
     do 
     {
 		data->name_game = malloc (sizeof(char) * 11);
-		printf("Donnez un nom a votre partie :");
+		printf("Donnez un nom a votre partie : ");
 		scanf("%s", data->name_game);
 		data->name_game[10] = 0;
 		fill_out_stdin();
@@ -935,24 +935,29 @@ void	lance_jeux (t_data *data, int *player_save)
 
 	if (player_save)
 		i = *player_save;
+	else
+		i = -1;
 	while (!is_end_game(data))
 	{
-		i = -1;
 		while (++i < data->nb_players && !is_end_game(data))
 		{
-			//score_inter = score_des (data, i);
-			score_inter = rand() % 15 + 21;
+			score_inter = score_des (data, i);
+			//score_inter = rand() % 15 + 21;
 			update_game (data, i, score_inter);
 			printf ("Fin du tour, appuyez sur ENTER\n");
 			while (getchar() != '\n');
 			fill_out_stdin();
-			save (data, data->name_game, i);
+			if (i + 1 < data->nb_players)
+				save (data, data->name_game, i + 1);
+			else
+				save (data, data->name_game, 0);
 		}
+		i = -1;
 	}
 	winner = get_winner(data);
 	clearScreen ();
 	print_score(data, winner);
-	printf ("Le gagnant est : %s\nFelicitations !!!!🏆\n", data->players[winner].name);
+	printf ("Le gagnant est : 🏆%s🏆 | Felicitations !!!!\n", data->players[winner].name);
 }
 
 int		menu(t_data *data)
@@ -963,7 +968,7 @@ int		menu(t_data *data)
 	res = malloc (sizeof(char) * 11);
 	while (get_yes_no("Voulez-vous charger un partie ?"))
 	{
-		printf("Entrez le nom de la partie a charge :");
+		printf("Entrez le nom de la partie a charge : ");
 		scanf ("%s", res);
 		fill_out_stdin();
 		res[10] = 0;
@@ -984,6 +989,7 @@ void	free_data(t_data *data)
 		free(data->players[i].name);
 	free(data->players);
 }
+
 
 int	main(int argc, char **argv)
 {
