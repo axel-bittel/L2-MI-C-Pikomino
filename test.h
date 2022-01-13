@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 14:58:25 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 15:33:14 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/13 16:56:34 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ typedef struct s_joueur
 
 typedef struct s_data 
 {
+	char		*name_game;
 	int			nb_players;
 	int			des[8];
 	t_joueur	*players;

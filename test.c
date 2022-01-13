@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 15:33:35 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/13 17:38:14 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -73,6 +73,27 @@ int	ft_strlen(char *str)
 	i = -1;
 	while (str[++i]);
 	return (i);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	int		i;
+	int		j;
+	char	*res;
+
+	i = -1;
+	res = (char *)malloc(sizeof(char) * (ft_strlen((char *)s1) + ft_strlen((char *)s2) + 1));
+	if (!res)
+		return (NULL);
+	if (!s1 || !s2)
+		return (0);
+	while (s1[++i])
+		res[i] = s1[i];
+	j = -1;
+	while (s2[++j])
+		res[i + j] = s2[j];
+	res[i + j] = 0;
+	return (res);
 }
 
 char	*ft_strdup(const char *str)
@@ -377,8 +398,6 @@ void	print_score (t_data *data, int winner)
 		if (data->players[i].name)
 		{
 			print_str_in_screen (screen, data->players[i].name, 2 , i + 3 + (i * 5));
-			if (i == winner)
-				screen [i + 3 + (i * 5)][2 + ft_strlen(data->players[i].name)] = (long long)'🏆';
 			j = -1;
 			while (++j < 16)
 				if (data->players[i].pikomino[j] != -1)
@@ -441,6 +460,11 @@ void    init_data (t_data *data)
 	print_playerboard (data);
     do 
     {
+		data->name_game = malloc (sizeof(char) * 11);
+		printf("Donnez un nom a votre partie :");
+		scanf("%s", data->name_game);
+		data->name_game[10] = 0;
+		fill_out_stdin();
         printf("%s : ", str2);
         scanf("%d", &n);
 		fill_out_stdin();
@@ -838,13 +862,79 @@ int	get_winner (t_data *data)
 	return (idx_win);
 }
 
-void	lance_jeux (t_data *data)
+void	save(t_data *data, char *name, int player)
+{
+	int		i;
+	int		j;
+	FILE	*file;
+
+	i = -1;
+	name = ft_strjoin(name, ".save");
+	file = fopen(name, "w");
+	free (name);
+	if (!file)
+		return ;
+	fprintf (file, "%d ", player); 
+	fprintf (file, "%d ", data->nb_players);
+	while (++i < data->nb_players)
+	{
+		fprintf (file, "%s ", data->players[i].name);
+		j = -1;
+		while (++j < 16)
+			fprintf (file, "%d ", data->players[i].pikomino[j]);
+		fprintf (file, "%d ", data->players[i].is_bot);
+	}
+	j = -1;
+	while (++j < 16)
+		fprintf (file, "%d ", data->pikomino[j]);
+	fclose (file);
+}
+
+int	load_game(t_data *data, char *name)
+{
+	int		i;
+	int		j;
+	int		player;
+	FILE	*file;
+
+	name = ft_strjoin(name, ".save");
+	file = fopen(name, "r");
+	if (!file)
+	{
+		free (name);
+		return (-1);
+	}
+	data->name_game = name;
+	fscanf (file, "%d", &player);
+	fscanf (file, "%d", &data->nb_players);
+	data->players = malloc (sizeof(t_joueur) * data->nb_players);
+	i = -1;
+	while (++i < data->nb_players)
+	{
+		data->players[i].name = malloc (sizeof(char) * 11);
+		fscanf(file, "%s", data->players[i].name);
+		data->players[i].name[10] = 0;
+		j = -1;
+		while (++j < 16)
+			fscanf (file, "%d ", data->players[i].pikomino + j);
+		fscanf (file, "%d ", &data->players[i].is_bot);
+	}
+	j = -1;
+	while (++j < 16)
+		fscanf (file, "%d ", data->pikomino + j);
+	fclose (file);
+	return (player);
+}
+
+void	lance_jeux (t_data *data, int *player_save)
 {
 	int	i;
 	int	j;
 	int	score_inter;
 	int	winner;
 
+	if (player_save)
+		i = *player_save;
 	while (!is_end_game(data))
 	{
 		i = -1;
@@ -856,6 +946,7 @@ void	lance_jeux (t_data *data)
 			printf ("Fin du tour, appuyez sur ENTER\n");
 			while (getchar() != '\n');
 			fill_out_stdin();
+			save (data, data->name_game, i);
 		}
 	}
 	winner = get_winner(data);
@@ -864,14 +955,48 @@ void	lance_jeux (t_data *data)
 	printf ("Le gagnant est : %s\nFelicitations !!!!🏆\n", data->players[winner].name);
 }
 
+int		menu(t_data *data)
+{
+	char	*res;
+	int		player;
+
+	res = malloc (sizeof(char) * 11);
+	while (get_yes_no("Voulez-vous charger un partie ?"))
+	{
+		printf("Entrez le nom de la partie a charge :");
+		scanf ("%s", res);
+		fill_out_stdin();
+		res[10] = 0;
+		if ((player = load_game(data, res)) != -1)
+			return player;
+		printf("Cette partie n'existe pas\n");
+	}
+	init_data(data);
+	return (-1);
+}
+ 
+void	free_data(t_data *data)
+{
+	int	i;
+
+	free(data->name_game);
+	while (++i < data->nb_players)
+		free(data->players[i].name);
+	free(data->players);
+}
+
 int	main(int argc, char **argv)
 {
 	t_data	data;
+	int		player_save;
 	srand(time(NULL));
 	clearScreen();
-	init_data(&data);
+	player_save = menu(&data);
 	clearScreen();
-	lance_jeux (&data);
-	//printf ("%ld\n", (long)'🏆');
+	if (player_save == -1)
+		lance_jeux (&data, 0);
+	else 
+		lance_jeux (&data, &player_save);
+	free_data (&data);
 	return (0);
 }
