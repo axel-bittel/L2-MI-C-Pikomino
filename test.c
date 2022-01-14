@@ -677,6 +677,7 @@ int	cumpute_score(int *valeurs)
 
 void	get_new_dice(t_data *data, int nbr_des)
 {
+#endif
 	int	i;
 
 	i = -1; 
@@ -716,11 +717,7 @@ int	is_value_in_dice(int *des, int value, int nb_dice)
 int score_des (t_data *data, int player)
 {
 	int i = -1 ;
-<<<<<<< HEAD
-	int n = 0;								    /* Valeur dé que joueur veut garder                                                        */
-=======
 	int n = 0;									/* Valeur dé que joueur veut garder                                                        */
->>>>>>> 53ea04937307dcb92a309dfd6259ec74ae27e38e
 	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
 	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
 	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */

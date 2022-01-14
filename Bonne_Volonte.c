@@ -137,57 +137,83 @@ int score_des (t_data *data, int player)
 
 
 /*
-Date de remise 	mardi 18 janvier 2022, 00:00
-Temps restant 	6 jours 9 heures
-Critères d'évaluation 	
-
-Pickomino
 Stratégie choix des dés du BOT  :   - lorsqu'on a lancé les dés, on prend un V (donc valeur 0) dès que possible (pour éviter le tour nul) 
                                     - si on n'a pas de V dans le lancer obtenu, ou qu'on en a déjà au moins récupéré un : 
                                     on cherche à faire le maximum de points.
+                                    - condition d'arrêt : tour raté ou on choisit de s'arrêter quand on a score supérieur au minimum de ce qui est sur la table
 Pour ne pas perdre trop de dés d'un coup, et risquer de faire un score trop faible par la suite, on n'autorise qu'un nbr limité de dés à prendre par lancers 
-sauf si la valeur qu'on veut prendre est supérieure à 3 
+sauf si la valeur qu'on veut prendre est supérieure stricte à 3.
+En ce qui concerne l'arrêt par choix, il faut prender en compte les dominos sur la table : on continue au moins tant qu'on n'est pas supérieur à la valeur 
+minimale. En revanche on ne s'arrête pas dès qu'on l'a atteinte ou dépasée, en fonction du nombre de dés à lancer et du nombre de valeurs différentes déjà 
+gardées, on continue (ratio à mettre en place)
 */
 
-int max_des_prenables (nbr_des)
+int max_des_prenables (int nbr_des, int n, int V)
 {
     int nbr_prenables ;
 
-    if (nbr_des >= 7)
-        nbr_prenables = 4 ;
-    else if ( (nbr_des >= 5) && (nbr_des < 7) )
-        nbr_prenables = 3 ;
+    if ( n =< 3)
+    {
+        if (nbr_des >= 7)
+            nbr_prenables = 4 ;
+        else if ( (nbr_des >= 5) && (nbr_des < 7) )
+            nbr_prenables = 3 ;
+        else 
+            nbr_prenables = 2 ;
+    }
     else 
-        nbr_prenables = 2 ;
+    {
+        if (V != 0)                                     /* V représentra le nombre de face V gardée  (ie : valeurs_prises[0] )                                */
+            nbr_prenables = nbr_des ;
+        else 
+            nbr_prenables = nbr_des - 1;
+    }
+}
+
+
+int stop_bot (t_data *data, nbr_des, possibilites, valeurs_prises) 
+{
+    
 }
 
 
 int score_des_bot (t_data *data)
 {
-    int score = 0 ;
+    int possibilites = 6 ;
     int nbr_des = 8 ;
-    int cpt = 0 ;
     int i = -1 ;
-    int n = 0 ;                                          /* La valeur de dé choisie par le bot                                                                */
+    int n ;                                              /* La valeur de dé choisie par le bot                                                                */
     int valeurs_prises[6] = {0, 0, 0, 0, 0, 0} ;         /* Tableau où indice = valeur dé ; valeur case = nbr dés déjà pris portant cette valeur              */
     int valeurs_possibles[6] = {0, 0, 0, 0, 0, 0} ;      /* Tableau où indice = valeur dé ; valeur case = nbr dés portant cette valeur présents sur table     */
 
-    while (++i < 9)
+    do 
     {
-        data->des[i] = (rand(void) % 6) ;
-        if (valeurs_prises[ data->des[i] ] == 0) 
-            valeurs_possibles[ data->des[i] ] += 1 ;
-    }
-    if (valeurs_possibles[0] != 0)
-            valeurs_prises[0] = valeurs_possibles[0] ;
-    else 
-    {
-        i = 1 ;
-        n = valeurs_possibles[1] ;
-        while (++i < 6)
+        get_new_dice(data, nbr_des) ;
+        while (++i < nbr_des)
         {
-            if ( (valeurs_possibles[i] * i) > )
-                n = i ;                   /* On a donc n, la valeur choisie, qui vaut le maximum qu'on peut obtenir en gardant les dés         */
+            if (valeurs_prises[ data->des[i] ] == 0) 
+                valeurs_possibles[ data->des[i] ] += 1 ;
         }
-    }
+        if (valeurs_possibles[0] != 0)
+                n = 0 ;                              
+        else 
+        {
+            i = 1 ;
+            n = valeurs_possibles[i] ;
+            while (++i < 6)
+            {
+                if ( (valeurs_possibles[i] * i) > n) && (valeurs_possibles[i] =< max_des_prenables(nbr_des, n, valeurs_possibles[0])) )
+                    n = i ;                              
+            }
+        }
+        valeurs_prises[n] = valeurs_possibles[n] ;
+        nbr_des -= valeurs_prises[n] ;
+        possibilites -= 1 ;
+        i = -1 ;
+        while (++i < 6)
+            valeurs_possibles[i] = 0 ;
+    } while ()
+    if ((valeurs[0] == 0) && (possibilites == -1)) 
+		return (0);
+	return (cumpute_score(valeurs)) ;
 }

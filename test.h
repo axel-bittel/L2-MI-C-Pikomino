@@ -66,19 +66,13 @@ int 	score_des (t_data *data, int player) ;
 int		is_end_game (t_data *data) ;
 void	tour_ratee (t_data *data, int player, int score) ;
 void	update_game (t_data *data, int player, int score) ;
+int		get_pts_player(t_data *data, int player) ;
+int		get_winner (t_data *data) ;
+void	save(t_data *data, char *name, int player) ;
+int		load_game(t_data *data, char *name) ;
 void	lance_jeux (t_data *data) ;
+int		menu(t_data *data) ;
+void	free_data(t_data *data) ;
 int		main(int argc, char **argv);
-void	print_table (t_data *data, int *score, int player);
-void	print_des (t_data *data, int nbr_des, int *valeurs);
-int		get_pts(int val);
-void	print_screen (long long	**screen);
-void	print_str_in_screen (long long**screen, char *obj, int x, int y);
-void	print_in_screen (long long **screen, long long **obj, int x, int y);
-long long	**get_pikomino(int val, int pts);
-long long	**get_blank_screen (int x, int y);
-int		get_yes_no(const char *str);
-void	clearScreen(void);
-int		ft_strlen(char *str);
-int		get_lst_pikomino (t_data *data, int player);
-#endif
 
+#endif
