@@ -149,13 +149,18 @@ Pour ne pas perdre trop de dés d'un coup, et risquer de faire un score trop fai
 sauf si la valeur qu'on veut prendre est supérieure à 3 
 */
 
-int max_des_prenables (t_data *data)
+int max_des_prenables (nbr_des)
 {
-    int nbr_depart = 8 ;
-    int nbr_prenables = 0 ;
+    int nbr_prenables ;
 
-    if
+    if (nbr_des >= 7)
+        nbr_prenables = 4 ;
+    else if ( (nbr_des >= 5) && (nbr_des < 7) )
+        nbr_prenables = 3 ;
+    else 
+        nbr_prenables = 2 ;
 }
+
 
 int score_des_bot (t_data *data)
 {
@@ -177,10 +182,11 @@ int score_des_bot (t_data *data)
             valeurs_prises[0] = valeurs_possibles[0] ;
     else 
     {
-        i = -1 ;
+        i = 1 ;
+        n = valeurs_possibles[1] ;
         while (++i < 6)
         {
-            if ( (valeurs_possibles[i] != 0) && () )
+            if ( (valeurs_possibles[i] * i) > )
                 n = i ;                   /* On a donc n, la valeur choisie, qui vaut le maximum qu'on peut obtenir en gardant les dés         */
         }
     }
