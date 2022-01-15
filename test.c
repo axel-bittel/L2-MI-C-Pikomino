@@ -6,12 +6,13 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/15 17:51:05 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/15 18:23:44 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "time.h"
 #include "test.h"
 
@@ -58,7 +59,6 @@ int	get_yes_no(const char *str)
 	while (!res)
 	{
 		printf ("%s (o/n) : ", str);
-		fill_out_stdin();
 		scanf ("%c", &res);
 		fill_out_stdin();
 		if (res != 'o' && res != 'n')
@@ -427,7 +427,6 @@ void    init_joueur (t_joueur *joueur, t_data *data, int player)
         do 
         {
 			printf ("Entrez votre nom : ");
-			fill_out_stdin();
             scanf ("%s", str2); 
 			fill_out_stdin();
 			str2[12] = 0;
@@ -467,12 +466,10 @@ void    init_data (t_data *data)
     {
 		data->name_game = malloc (sizeof(char) * 11);
 		printf("Donnez un nom a votre partie : ");
-		fill_out_stdin();
 		scanf("%s", data->name_game);
 		data->name_game[10] = 0;
 		fill_out_stdin();
         printf("%s : ", str2);
-		fill_out_stdin();
         scanf("%d", &n);
 		fill_out_stdin();
         if ( (n < 2) || (n > 7) )
@@ -730,6 +727,7 @@ int score_des (t_data *data, int player)
 	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
 	int valeurs[6] = {-1, -1, -1, -1, -1, -1};	/* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
 	char str[] = "Voulez-vous relancer les dés ?" ;
+	char inter[] = "          ";
 
 	do
 	{
@@ -759,9 +757,8 @@ int score_des (t_data *data, int player)
 				}
 				printf("\nQuels dés voulez-vous garder ? \n") ;
 				printf("Entrez la valeur : ") ;
-				fill_out_stdin();
-				scanf("%c", (char *)&n ) ;
-				n = (n == 'V') ? 0 : n - 48;
+				scanf("%s", inter);
+				n = !strcmp(inter,"V\n") ? 0 : atoi(inter);
 				fill_out_stdin();
 				if (!is_value_in_dice(data->des, n, nbr_des))
 					err = printf("Vous ne disposez pas de cette valeur, veuillez en choisir une delivrée par les dés\n") ;
@@ -1094,7 +1091,6 @@ int		menu(t_data *data)
 	while (get_yes_no("Voulez-vous charger un partie ?"))
 	{
 		printf("Entrez le nom de la partie a charge : ");
-		fill_out_stdin();
 		scanf ("%s", res);
 		fill_out_stdin();
 		res[10] = 0;
