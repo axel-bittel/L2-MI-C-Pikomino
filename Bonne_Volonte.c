@@ -145,7 +145,7 @@ Pour ne pas perdre trop de dés d'un coup, et risquer de faire un score trop fai
 sauf si la valeur qu'on veut prendre est supérieure stricte à 3.
 En ce qui concerne l'arrêt par choix, il faut prender en compte les dominos sur la table : on continue au moins tant qu'on n'est pas supérieur à la valeur 
 minimale. En revanche on ne s'arrête pas dès qu'on l'a atteinte ou dépasée, en fonction du nombre de dés à lancer et du nombre de valeurs différentes déjà 
-gardées, on continue (ratio à mettre en place)
+gardées, on continue (ratio à mettre en place en dur)
 */
 
 int max_des_prenables (int nbr_des, int n, int V)
@@ -163,7 +163,7 @@ int max_des_prenables (int nbr_des, int n, int V)
     }
     else 
     {
-        if (V != 0)                                     /* V représentra le nombre de face V gardée  (ie : valeurs_prises[0] )                                */
+        if (V != 0)                                      /* V représentra le nombre de face V gardée  (ie : valeurs_prises[0] )                               */
             nbr_prenables = nbr_des ;
         else 
             nbr_prenables = nbr_des - 1;
@@ -171,9 +171,29 @@ int max_des_prenables (int nbr_des, int n, int V)
 }
 
 
-int stop_bot (t_data *data, nbr_des, possibilites, valeurs_prises) 
+int stop_bot (t_data *data, nbr_des, n, valeurs_prises) 
 {
-    
+    int stop ;                                           /* Vaut 0 si on s'arrête, 1 sinon                                                                    */
+    int i = -1 ;
+    int cpt = 0 ;                                        /* Compte nombre de valeurs différentes qu'on a déjà prises, sans considérer le nbr de dés           */
+    int score ;
+
+    while (++i < 6)
+    {
+        if (valeurs_prises[i] != 0 )
+            cpt += 1 ;
+    }
+    if ((nbr_des > 2) && (cpt < 5))                      /* Risque toléré en ce qui concerne le rapport entre nbr_des et nbr de valeurs pas encore prises     */
+    {
+        score = compute_score(valeurs_prises) ;
+        if (is_table_has_less (data, score) != -1 )      /* On compare notre score aux dominos sur table : peut-on en prendre un ou non ?                     */
+            stop = 0 ;
+        if ((get_joueur_has_val (data, score) != -1) && (get_joueur_has_val(data, score) != -2) )   /* Comparaison aux derniers dominos des joueurs           */
+            stop = 0 ;
+        else
+            stop = 1 ;                                   /* On ne peut rien prendre et on autorise encore le jeu : on continue                                */
+    }
+    else stop = 0 ;                                      /* On a attient le nbr de dés et le nbr de valeurs prises qu'on autorise : on s'arrête               */
 }
 
 
@@ -212,8 +232,8 @@ int score_des_bot (t_data *data)
         i = -1 ;
         while (++i < 6)
             valeurs_possibles[i] = 0 ;
-    } while ()
-    if ((valeurs[0] == 0) && (possibilites == -1)) 
+    } while (stop_bot (data, nbr_des, n, valeurs_prises) == 1)
+    if (valeurs_prises[0] == 0) 
 		return (0);
-	return (cumpute_score(valeurs)) ;
+	return (cumpute_score(valeurs_prises)) ;
 }

@@ -677,7 +677,6 @@ int	cumpute_score(int *valeurs)
 
 void	get_new_dice(t_data *data, int nbr_des)
 {
-#endif
 	int	i;
 
 	i = -1; 
