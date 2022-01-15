@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <test.h> 
-#include <test.c>
-
+#include "test.h"
+/*
 void    init_joueur (t_joueur *joueur, t_data *data, int player) 
 {
     char str1[] = "Etes-vous un humain ?";
@@ -79,13 +78,14 @@ void    init_data (t_data *data)
 int score_des (t_data *data, int player)
 {
 	int i = -1 ;
-	int n = 0;								    /* Valeur dé que joueur veut garder                                                        */
-	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
-	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
-	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
-	int valeurs[6] = {-1, -1, -1, -1, -1, -1};	/* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
-	char str[] = "Voulez-vous relancer les dés ?" ;
+	int n = 0;								 */ /* Valeur dé que joueur veut garder                                                        */
+//	int possibilites = 6;						/* Nombre valeurs déja prises pour les dés                                                 */
+//	int nbr_des = 8;							/* Nombre dés à lancer                                                                     */
+//	int nbr_lancers = 0;						/* Nombre de lancers effectués et ayant aboutis                                            */
+//	int valeurs[6] = {-1, -1, -1, -1, -1, -1};	/* Tableau où indice = valeur du dé gardé ; valeur case = nbr dés gardés pour cette valeur */
+//	char str[] = "Voulez-vous relancer les dés ?" ;
 
+/*
 	do
 	{
 		get_new_dice(data, nbr_des);
@@ -129,11 +129,11 @@ int score_des (t_data *data, int player)
 			print_des(0, nbr_des, valeurs); 
 		} 
 	} while (possibilites && get_yes_no(str)); 
-	if ((valeurs[0] == -1)) 
+	if (valeurs[0] == -1)
 		return (0);
-	return (cumpute_score(valeurs));
+	return (compute_score(valeurs));
 }
-
+*/
 
 
 /*
@@ -152,7 +152,7 @@ int max_des_prenables (int nbr_des, int n, int V)
 {
     int nbr_prenables ;
 
-    if ( n =< 3)
+    if ( n <= 3)
     {
         if (nbr_des >= 7)
             nbr_prenables = 4 ;
@@ -168,35 +168,33 @@ int max_des_prenables (int nbr_des, int n, int V)
         else 
             nbr_prenables = nbr_des - 1;
     }
+	return (nbr_prenables);
 }
 
 
-int stop_bot (t_data *data, nbr_des, n, valeurs_prises) 
+int stop_bot (t_data *data, int nbr_des, int n, int *valeurs_prises) 
 {
-    int stop ;                                           /* Vaut 0 si on s'arrête, 1 sinon                                                                    */
+    int stop = 0;                                           /* Vaut 0 si on s'arrête, 1 sinon                                                                    */
     int i = -1 ;
     int cpt = 0 ;                                        /* Compte nombre de valeurs différentes qu'on a déjà prises, sans considérer le nbr de dés           */
-    int score ;
+    int score  = 0;
 
     while (++i < 6)
-    {
-        if (valeurs_prises[i] != 0 )
+        if (valeurs_prises[i] != 0)
             cpt += 1 ;
-    }
-    if ((nbr_des > 2) && (cpt < 5))                      /* Risque toléré en ce qui concerne le rapport entre nbr_des et nbr de valeurs pas encore prises     */
+    if ((nbr_des > 2))                      /* Risque toléré en ce qui concerne le rapport entre nbr_des et nbr de valeurs pas encore prises     */
     {
         score = compute_score(valeurs_prises) ;
-        if (is_table_has_less (data, score) != -1 )      /* On compare notre score aux dominos sur table : peut-on en prendre un ou non ?                     */
-            stop = 0 ;
-        if ((get_joueur_has_val (data, score) != -1) && (get_joueur_has_val(data, score) != -2) )   /* Comparaison aux derniers dominos des joueurs           */
-            stop = 0 ;
-        else
-            stop = 1 ;                                   /* On ne peut rien prendre et on autorise encore le jeu : on continue                                */
+        if (get_joueur_has_val(data, score) != -2 || is_table_has_less(data, score) != -1)   /* Comparaison aux derniers dominos des joueurs           */
+            stop = 1;
     }
-    else stop = 0 ;                                      /* On a attient le nbr de dés et le nbr de valeurs prises qu'on autorise : on s'arrête               */
+	if (!nbr_des)
+		stop = 1;
+	return (stop);
 }
 
-
+#include <unistd.h>
+#include <time.h>
 int score_des_bot (t_data *data)
 {
     int possibilites = 6 ;
@@ -209,31 +207,50 @@ int score_des_bot (t_data *data)
     do 
     {
         get_new_dice(data, nbr_des) ;
+		print_des (data, nbr_des, valeurs_prises);
+		i = -1;
         while (++i < nbr_des)
         {
             if (valeurs_prises[ data->des[i] ] == 0) 
-                valeurs_possibles[ data->des[i] ] += 1 ;
+                valeurs_possibles[ data->des[i] ] += 1;
         }
-        if (valeurs_possibles[0] != 0)
-                n = 0 ;                              
+        if (valeurs_possibles[0] != 0 && valeurs_prises[0] == 0)
+                n = 0 ;
         else 
         {
-            i = 1 ;
+            i = 1;
             n = valeurs_possibles[i] ;
             while (++i < 6)
-            {
-                if ( (valeurs_possibles[i] * i) > n) && (valeurs_possibles[i] =< max_des_prenables(nbr_des, n, valeurs_possibles[0])) )
-                    n = i ;                              
-            }
+                if (( (valeurs_possibles[i] * i) > n) && (valeurs_possibles[i] <= max_des_prenables(nbr_des, n, valeurs_possibles[0])) )
+                    n = i ;
+			if (!n)
+				break ;
         }
         valeurs_prises[n] = valeurs_possibles[n] ;
         nbr_des -= valeurs_prises[n] ;
         possibilites -= 1 ;
         i = -1 ;
         while (++i < 6)
-            valeurs_possibles[i] = 0 ;
-    } while (stop_bot (data, nbr_des, n, valeurs_prises) == 1)
-    if (valeurs_prises[0] == 0) 
+            valeurs_possibles[i] = 0;
+		printf("\nQuels dés voulez-vous garder ? \n") ;
+		printf("Entrez la valeur : ") ;
+		sleep (1);
+		if (n != 0)
+			printf("%d\n", n);
+		else
+			printf("V\n", n);
+		sleep (1);
+		printf ("*---------------*");
+    } while (!stop_bot (data, nbr_des, n, valeurs_prises));
+	printf ("Score : %d\n", compute_score(valeurs_prises));
+    if (valeurs_prises[0] == 0 || !n)
 		return (0);
-	return (cumpute_score(valeurs_prises)) ;
+	return (compute_score(valeurs_prises)) ;
+}
+
+int	main()
+{
+	srand (time ( NULL ) );
+	t_data	dt;
+	score_des_bot (&dt);
 }

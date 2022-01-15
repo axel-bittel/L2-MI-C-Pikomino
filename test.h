@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 14:58:25 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 16:56:34 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/15 15:21:50 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,18 +35,19 @@ void	print_pikomino(int val, int pts);
 int		get_yes_no(const char *str);
 int		ft_strlen(char *str);
 char	*ft_strdup(const char *str);
-int		**get_blank_screen (int x, int y);
-int		**get_pikomino(int val, int pts);
-void	print_in_screen (int**screen, int **obj, int x, int y);
-void	print_str_in_screen (int**screen, char *obj, int x, int y);
-void	print_screen (int	**screen);
+long long		**get_blank_screen (int x, int y);
+long long		**get_pikomino(int val, int pts);
+void	print_in_screen (long long **screen, long long **obj, int x, int y);
+void	print_str_in_screen (long long **screen, char *obj, int x, int y);
+void	print_screen (long long **screen);
 void	print_des (t_data *data, int nbr_des, int *valeurs);
-void	free_screen (int **screen);
+void	free_screen (long long **screen);
 void	print_table (t_data *data, int *score, int player);
 void	print_playerboard (t_data *data);
 
 void    init_joueur (t_joueur *joueur, t_data *data, int player) ;
 void    init_data (t_data *data) ;
+
 int		get_fst_pikomino (t_data *data, int player);
 int		get_lst_pikomino (t_data *data, int player);
 int		get_max_pikomino (t_data *data, int player);
@@ -58,7 +59,7 @@ int		is_val_in (int *tab, int val);
 int		get_joueur_has_val (t_data *data, int val);
 int		is_table_has_less (t_data *data, int score);
 int		get_pts(int val);
-int		cumpute_score(int *valeurs);
+int		compute_score(int *valeurs);
 void	get_new_dice(t_data *data, int nbr_des);
 int		can_take_dice(int *valeurs, int *des, int nbr_des);
 int		is_value_in_dice(int *des, int value, int nb_dice);
@@ -70,7 +71,7 @@ int		get_pts_player(t_data *data, int player) ;
 int		get_winner (t_data *data) ;
 void	save(t_data *data, char *name, int player) ;
 int		load_game(t_data *data, char *name) ;
-void	lance_jeux (t_data *data) ;
+void	lance_jeux (t_data *data, int *player_save) ;
 int		menu(t_data *data) ;
 void	free_data(t_data *data) ;
 int		main(int argc, char **argv);

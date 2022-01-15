@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/13 18:15:12 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/15 17:51:05 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -30,7 +30,10 @@ void	clearScreen(void)
 
 void	fill_out_stdin(void)
 {
-	while (fgetc( stdin ) != '\n');
+	int	c;
+
+	fflush(stdin);
+	while((c=getchar()) != EOF && c != '\n');
 }
 
 void	print_pikomino(int val, int pts)
@@ -55,6 +58,7 @@ int	get_yes_no(const char *str)
 	while (!res)
 	{
 		printf ("%s (o/n) : ", str);
+		fill_out_stdin();
 		scanf ("%c", &res);
 		fill_out_stdin();
 		if (res != 'o' && res != 'n')
@@ -287,7 +291,7 @@ void	print_des (t_data *data, int nbr_des, int *valeurs)
 			write (1, "] ", 1);
 		}
 	}
-	write (1, "\n", 1);
+	printf ("	|	Score provisoire : %d\n", compute_score(valeurs));
 }
 
 void	free_screen (long long **screen)
@@ -423,6 +427,7 @@ void    init_joueur (t_joueur *joueur, t_data *data, int player)
         do 
         {
 			printf ("Entrez votre nom : ");
+			fill_out_stdin();
             scanf ("%s", str2); 
 			fill_out_stdin();
 			str2[12] = 0;
@@ -462,10 +467,12 @@ void    init_data (t_data *data)
     {
 		data->name_game = malloc (sizeof(char) * 11);
 		printf("Donnez un nom a votre partie : ");
+		fill_out_stdin();
 		scanf("%s", data->name_game);
 		data->name_game[10] = 0;
 		fill_out_stdin();
         printf("%s : ", str2);
+		fill_out_stdin();
         scanf("%d", &n);
 		fill_out_stdin();
         if ( (n < 2) || (n > 7) )
@@ -662,13 +669,14 @@ int	get_pts(int val)
 	return (0);
 }
 
-int	cumpute_score(int *valeurs)
+int	compute_score(int *valeurs)
 {
 	int	i;
 	int	score = 0;
 
-	i = -1;
-	score += valeurs[0] * 5;          /* La face V du dé est représentée par la valeur 0, or elle vaut (en score) 5 points        */
+	i = 0;
+	if (valeurs[i] != -1)
+		score += valeurs[0] * 5;          /* La face V du dé est représentée par la valeur 0, or elle vaut (en score) 5 points        */
 	while (++i < 6)
 		if (valeurs[i] != -1)
 			score += i * valeurs[i];
@@ -744,12 +752,17 @@ int score_des (t_data *data, int player)
 			do {
 				err = 0;
 				if (!can_take_dice(valeurs, data->des, nbr_des))
+				{
+					printf ("You can't take a dice !\n");
+					sleep (3);
 					return (0);
+				}
 				printf("\nQuels dés voulez-vous garder ? \n") ;
 				printf("Entrez la valeur : ") ;
+				fill_out_stdin();
 				scanf("%c", (char *)&n ) ;
 				n = (n == 'V') ? 0 : n - 48;
-				fill_out_stdin() ;
+				fill_out_stdin();
 				if (!is_value_in_dice(data->des, n, nbr_des))
 					err = printf("Vous ne disposez pas de cette valeur, veuillez en choisir une delivrée par les dés\n") ;
 				else if (valeurs[n] != -1)
@@ -764,11 +777,112 @@ int score_des (t_data *data, int player)
 			clearScreen();
 			print_table (data, 0, player);
 			print_des(0, nbr_des, valeurs);
+			printf ("You have %d dices to play \n", nbr_des);
 		} 
 	} while (possibilites && get_yes_no(str)); 
-	if ((valeurs[0] == -1)) 
+	if (valeurs[0] == -1)
 		return (0);
-	return (cumpute_score(valeurs));
+	return (compute_score(valeurs));
+}
+
+int max_des_prenables (int nbr_des, int n, int V)
+{
+    int nbr_prenables ;
+
+    if ( n <= 3)
+    {
+        if (nbr_des >= 7)
+            nbr_prenables = 4 ;
+        else if ( (nbr_des >= 5) && (nbr_des < 7) )
+            nbr_prenables = 3 ;
+        else 
+            nbr_prenables = 2 ;
+    }
+    else 
+    {
+        if (V != 0)                                      /* V représentra le nombre de face V gardée  (ie : valeurs_prises[0] )                               */
+            nbr_prenables = nbr_des ;
+        else 
+            nbr_prenables = nbr_des - 1;
+    }
+	return (nbr_prenables);
+}
+
+
+int stop_bot (t_data *data, int nbr_des, int n, int *valeurs_prises) 
+{
+    int stop = 0;                                           /* Vaut 0 si on s'arrête, 1 sinon                                                                    */
+    int i = -1 ;
+    int cpt = 0 ;                                        /* Compte nombre de valeurs différentes qu'on a déjà prises, sans considérer le nbr de dés           */
+    int score  = 0;
+
+    while (++i < 6)
+        if (valeurs_prises[i] != 0)
+            cpt += 1 ;
+    if ((nbr_des > 2))                      /* Risque toléré en ce qui concerne le rapport entre nbr_des et nbr de valeurs pas encore prises     */
+    {
+        score = compute_score(valeurs_prises) ;
+        if (get_joueur_has_val(data, score) != -2 || is_table_has_less(data, score) != -1)   /* Comparaison aux derniers dominos des joueurs           */
+            stop = 1;
+    }
+	if (!nbr_des)
+		stop = 1;
+	return (stop);
+}
+
+int score_des_bot (t_data *data, int player)
+{
+    int possibilites = 6 ;
+    int nbr_des = 8 ;
+    int i = -1 ;
+    int n ;                                              /* La valeur de dé choisie par le bot                                                                */
+    int valeurs_prises[6] = {0, 0, 0, 0, 0, 0} ;         /* Tableau où indice = valeur dé ; valeur case = nbr dés déjà pris portant cette valeur              */
+    int valeurs_possibles[6] = {0, 0, 0, 0, 0, 0} ;      /* Tableau où indice = valeur dé ; valeur case = nbr dés portant cette valeur présents sur table     */
+
+    do 
+    {
+		clearScreen ();
+		print_table (data, 0, player);
+        get_new_dice(data, nbr_des) ;
+		print_des (data, nbr_des, valeurs_prises);
+		i = -1;
+        while (++i < nbr_des)
+        {
+            if (valeurs_prises[ data->des[i] ] == 0) 
+                valeurs_possibles[ data->des[i] ] += 1;
+        }
+        if (valeurs_possibles[0] != 0 && valeurs_prises[0] == 0)
+                n = 0 ;
+        else 
+        {
+            i = 1;
+            n = valeurs_possibles[i] ;
+            while (++i < 6)
+                if (( (valeurs_possibles[i] * i) > n) && (valeurs_possibles[i] <= max_des_prenables(nbr_des, n, valeurs_possibles[0])) )
+                    n = i ;
+			if (!n)
+				break ;
+        }
+        valeurs_prises[n] = valeurs_possibles[n] ;
+        nbr_des -= valeurs_prises[n] ;
+        possibilites -= 1 ;
+        i = -1 ;
+        while (++i < 6)
+            valeurs_possibles[i] = 0;
+		printf("\nQuels dés voulez-vous garder ? \n");
+		printf("Entrez la valeur : ");
+		if (n != 0)
+			printf("%d\n", n);
+		else
+			printf("V\n", n);
+		sleep (2);
+    } while (!stop_bot (data, nbr_des, n, valeurs_prises));
+	clearScreen ();
+	print_table (data, 0, player);
+	print_des (data, nbr_des, valeurs_prises);
+    if (valeurs_prises[0] == 0)
+		return (0);
+	return (compute_score(valeurs_prises)) ;
 }
 
 int	is_end_game (t_data *data)
@@ -934,19 +1048,30 @@ void	lance_jeux (t_data *data, int *player_save)
 	int	winner;
 
 	if (player_save)
-		i = *player_save;
+	{
+		i = *player_save - 1;
+		if (i < 0)
+			i = data->nb_players - 1;
+	}
 	else
 		i = -1;
 	while (!is_end_game(data))
 	{
 		while (++i < data->nb_players && !is_end_game(data))
 		{
-			score_inter = score_des (data, i);
-			//score_inter = rand() % 15 + 21;
+			if (!data->players[i].is_bot)
+				score_inter = score_des (data, i);
+			else
+				score_inter = score_des_bot(data, i);
 			update_game (data, i, score_inter);
 			printf ("Fin du tour, appuyez sur ENTER\n");
-			while (getchar() != '\n');
-			fill_out_stdin();
+			if (!data->players[i].is_bot)
+			{
+				while (getchar() != '\n');
+				fill_out_stdin();
+			}
+			else
+				sleep (1);
 			if (i + 1 < data->nb_players)
 				save (data, data->name_game, i + 1);
 			else
@@ -969,6 +1094,7 @@ int		menu(t_data *data)
 	while (get_yes_no("Voulez-vous charger un partie ?"))
 	{
 		printf("Entrez le nom de la partie a charge : ");
+		fill_out_stdin();
 		scanf ("%s", res);
 		fill_out_stdin();
 		res[10] = 0;
@@ -989,7 +1115,6 @@ void	free_data(t_data *data)
 		free(data->players[i].name);
 	free(data->players);
 }
-
 
 int	main(int argc, char **argv)
 {
