@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/15 18:23:44 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/15 18:39:16 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -328,7 +328,7 @@ void	print_table (t_data *data, int *score, int player)
 			print_in_screen(screen, get_pikomino(get_lst_pikomino(data, i), get_pts(get_lst_pikomino(data, i))), 27 + i * 30, 3);
 		}
 	}
-	i = 4;
+	i = 3;
 	while (++i < 7)
 	{
 		if (i < data->nb_players)
