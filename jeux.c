@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/17 12:13:49 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/17 13:48:58 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "time.h"
-#include "test.h"
+#include "jeux.h"
 
 //***************************************************************************
 //#PRINT#
