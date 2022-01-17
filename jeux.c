@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/17 13:48:58 by abittel          ###   #########         */
+/*   Updated: 2022/01/17 21:29:43 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -403,6 +403,7 @@ void	print_score (t_data *data, int winner) //Affiche tableau de resultats
 //***************************************************************************yy
 void    init_joueur (t_joueur *joueur, t_data *data, int player) //Initialise un joueur
 {
+	printf ("Player %d : \n", player + 1);
     char str1[] = "Are you human ?";
     char *str2 = malloc (sizeof(char) * 13);
     const char *str[] = {"S.Veil" , "D.Knuth", "M.Debre", "A.Lovelace", "G.Hopper", "Ghandhi", "N.Mandela"} ;
@@ -441,7 +442,7 @@ void    init_joueur (t_joueur *joueur, t_data *data, int player) //Initialise un
 
 void    init_data (t_data *data)//Initialise les donnees du jeux 
 {
-    char str2[] = "Decide on a number of players. You need to be between 2 and 7 players (included)\n Write this number:" ;
+    char str2[] = "Decide on a number of players. You need to be between 2 and 7 players (included)\nWrite this number : " ;
     int n ;
     int i = -1 ;
     int j = -1 ;
