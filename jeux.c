@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   jeux.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/17 12:08:50 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/17 12:13:49 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -1097,17 +1097,3 @@ void	free_data(t_data *data)
 		free(data->players[i].name);
 	free(data->players);
 }
-
-int	main(int argc, char **argv)
-{
-	t_data	data;
-	int		player_save;
-	srand(time(NULL));
-	clearScreen();
-	player_save = menu(&data);
-	clearScreen();
-	if (player_save == -1)
-		lance_jeux (&data, 0);
-	else 
-		lance_jeux (&data, &player_save);
-	free_data (&data);
