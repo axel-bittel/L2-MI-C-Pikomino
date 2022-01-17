@@ -176,12 +176,8 @@ int stop_bot (t_data *data, int nbr_des, int n, int *valeurs_prises)
 {
     int stop = 0;                                           /* Vaut 0 si on s'arrête, 1 sinon                                                                    */
     int i = -1 ;
-    int cpt = 0 ;                                        /* Compte nombre de valeurs différentes qu'on a déjà prises, sans considérer le nbr de dés           */
     int score  = 0;
 
-    while (++i < 6)
-        if (valeurs_prises[i] != 0)
-            cpt += 1 ;
     if ((nbr_des > 2))                      /* Risque toléré en ce qui concerne le rapport entre nbr_des et nbr de valeurs pas encore prises     */
     {
         score = compute_score(valeurs_prises) ;
