@@ -6,7 +6,7 @@
 /*   By: abittel <abittel@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/14 10:15:07 by abittel           #+#    #+#             */
-/*   Updated: 2022/01/15 18:39:16 by abittel          ###   ########.fr       */
+/*   Updated: 2022/01/17 12:08:50 by abittel          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <unistd.h>
@@ -37,21 +37,7 @@ void	fill_out_stdin(void)
 	while((c=getchar()) != EOF && c != '\n');
 }
 
-void	print_pikomino(int val, int pts)
-{
-	printf ("\n");
-	printf ("┌──┐"); 
-	printf ("\n");
-	printf ("│%d│", val); 
-	printf ("\n");
-	printf ("├──┤"); 
-	printf ("\n");
-	printf ("│ %d│", pts);
-	printf ("\n");
-	printf ("└──┘"); 
-}
-
-int	get_yes_no(const char *str)
+int	get_yes_no(const char *str) // Pose une question au joueur
 {
 	char	res;
 	
@@ -70,7 +56,7 @@ int	get_yes_no(const char *str)
 	return (res == 'o');
 }
 
-int	ft_strlen(char *str)
+int	ft_strlen(char *str) //Taille d'une chaine
 {
 	int	i;
 
@@ -79,7 +65,7 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *s1, char const *s2) // Join deux chaine dans une nouvelle malloc
 {
 	int	i;
 	int	j;
@@ -100,7 +86,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (res);
 }
 
-char	*ft_strdup(const char *str)
+char	*ft_strdup(const char *str) //Copie chaine dans un nouvelle chaine malloc
 {
 	int		i;
 	char	*res;
@@ -113,7 +99,7 @@ char	*ft_strdup(const char *str)
 	return (res);
 }
 
-long long	**get_blank_screen (int x, int y)
+long long	**get_blank_screen (int x, int y) //Genere un screen vide
 {
 	int		i;
 	int		j;
@@ -154,34 +140,34 @@ long long	**get_pikomino(int val, int pts)
 	val = val == -1 ? 0 : val;
 	pik_res = malloc (sizeof(long long *) * 6);
 	pik_res[0] = malloc (sizeof(long long) * 5);
-	pik_res[0][0] = 14849164;
-	pik_res[0][1] = 14849152;
-	pik_res[0][2] = 14849152;
-	pik_res[0][3] = 14849168;
-	pik_res[0][4] = 0;
-	pik_res[1] = malloc (sizeof(long long) * 5);
-	pik_res[1][0] = 14849154;
+	pik_res[0][0] = 14849164; // chr = ┌
+	pik_res[0][1] = 14849152; // chr = ─
+	pik_res[0][2] = 14849152; // chr = ─
+	pik_res[0][3] = 14849168; // chr = ┐
+	pik_res[0][4] = 0;  
+	pik_res[1] = malloc (sizeof(long long) * 5); 
+	pik_res[1][0] = 14849154; // chr = │
 	pik_res[1][1] = (long long)(' ');
 	pik_res[1][2] = (long long)(' ');
-	pik_res[1][3] = 14849154;
+	pik_res[1][3] = 14849154; // chr = │
 	pik_res[1][4] = 0;
 	pik_res[2] = malloc (sizeof(long long) * 5);
-	pik_res[2][0] = val ? 14849180 : 14849154;
-	pik_res[2][1] = val ? 14849152 : (long long)(' ');
-	pik_res[2][2] = val ? 14849152 : (long long)(' ');
-	pik_res[2][3] = val ? 14849188 : 14849154;
+	pik_res[2][0] = val ? 14849180 : 14849154; // chr = ├ ou │
+	pik_res[2][1] = val ? 14849152 : (long long)(' '); //chr = ─ ou space
+	pik_res[2][2] = val ? 14849152 : (long long)(' '); //chr = ─ ou space
+	pik_res[2][3] = val ? 14849188 : 14849154; // chr = ┤ ou │
 	pik_res[2][4] = 0;
 	pik_res[3] = malloc (sizeof(long long) * 5);
-	pik_res[3][0] = 14849154;
+	pik_res[3][0] = 14849154; // chr = │
 	pik_res[3][1] = (long long)(' ');
 	pik_res[3][2] = (long long)(' ');
-	pik_res[3][3] = 14849154;
+	pik_res[3][3] = 14849154; // chr = │
 	pik_res[3][4] = 0;
 	pik_res[4] = malloc (sizeof(long long) * 5);
-	pik_res[4][0] = 14849172;
-	pik_res[4][1] = 14849152;
-	pik_res[4][2] = 14849152;
-	pik_res[4][3] = 14849176;
+	pik_res[4][0] = 14849172; // chr = └
+	pik_res[4][1] = 14849152; // chr = ─
+	pik_res[4][2] = 14849152; // chr = ─
+	pik_res[4][3] = 14849176; // chr = ┘  
 	pik_res[4][4] = 0;
 	if (val)
 	{
@@ -193,7 +179,7 @@ long long	**get_pikomino(int val, int pts)
 	return (pik_res);
 }
 
-void	print_in_screen (long long**screen, long long **obj, int x, int y)
+void	print_in_screen (long long**screen, long long **obj, int x, int y) //Rempli screen avec obj en (x, y)
 {
 	int		i;
 	int		j;
@@ -209,7 +195,7 @@ void	print_in_screen (long long**screen, long long **obj, int x, int y)
 	free (obj);
 }
 
-void	print_str_in_screen (long long**screen, char *obj, int x, int y)
+void	print_str_in_screen (long long**screen, char *obj, int x, int y) //Rempli screen avec la chaine obj en (x, y)
 {
 	int		i;
 
@@ -218,7 +204,7 @@ void	print_str_in_screen (long long**screen, char *obj, int x, int y)
 		screen[y][x + i] = obj[i];
 }
 
-void	print_screen (long long	**screen)
+void	print_screen (long long	**screen) //Affiche le tableau, en decomposant lel'entier de 64 bits en octets
 {
 	int		i;
 	int		j;
@@ -251,7 +237,7 @@ void	print_screen (long long	**screen)
 	}
 }
 
-void	print_des (t_data *data, int nbr_des, int *valeurs)
+void	print_des (t_data *data, int nbr_des, int *valeurs) //Affiche les des
 {
 	int		i;
 	int		j;
@@ -294,7 +280,7 @@ void	print_des (t_data *data, int nbr_des, int *valeurs)
 	printf ("	|	Interim score : %d\n", compute_score(valeurs));
 }
 
-void	free_screen (long long **screen)
+void	free_screen (long long **screen) //Free tableau screen
 {
 	int	i;
 
@@ -304,7 +290,7 @@ void	free_screen (long long **screen)
 	free (screen);
 }
 
-void	print_table (t_data *data, int *score, int player)
+void	print_table (t_data *data, int *score, int player) //Affiche le jeux
 {
 	int			i;
 	long long	**screen;
@@ -363,7 +349,7 @@ void	print_table (t_data *data, int *score, int player)
 	write (1, "\n", 1);
 }
 
-void	print_playerboard (t_data *data)
+void	print_playerboard (t_data *data) //Affiche le tableau des joeurs (chargement des donnees)
 {
 	int			i;
 	long long	**screen;
@@ -388,7 +374,7 @@ void	print_playerboard (t_data *data)
 	write (1, "\n", 1);
 }
 
-void	print_score (t_data *data, int winner)
+void	print_score (t_data *data, int winner) //Affiche tableau de resultats
 {
 	int			i;
 	int			j;
@@ -415,7 +401,7 @@ void	print_score (t_data *data, int winner)
 //***************************************************************************yy
 //#DATA_MANAGEMENT#
 //***************************************************************************yy
-void    init_joueur (t_joueur *joueur, t_data *data, int player) 
+void    init_joueur (t_joueur *joueur, t_data *data, int player) //Initialise un joueur
 {
     char str1[] = "Are you human ?";
     char *str2 = malloc (sizeof(char) * 13);
@@ -453,7 +439,7 @@ void    init_joueur (t_joueur *joueur, t_data *data, int player)
 }
 
 
-void    init_data (t_data *data) 
+void    init_data (t_data *data)//Initialise les donnees du jeux 
 {
     char str2[] = "Decide on a number of players. You need to be between 2 and 7 players (included)\n Write this number:" ;
     int n ;
@@ -491,7 +477,7 @@ void    init_data (t_data *data)
     } while ((n < 2) || (n > 7)) ;
 }
 
-int	get_fst_pikomino (t_data *data, int player)
+int	get_fst_pikomino (t_data *data, int player)//Renvoie le premier pikomono d'un joeur (-1 est le plateau)
 {
 	int	*tab;
 	int	i;
@@ -507,7 +493,7 @@ int	get_fst_pikomino (t_data *data, int player)
 	return (-1);
 }
 
-int	get_lst_pikomino (t_data *data, int player)
+int	get_lst_pikomino (t_data *data, int player)//Renvoie le dernier pikomono d'un joeur (-1 est le plateau)
 {
 	int	*tab;
 	int	i;
@@ -523,7 +509,7 @@ int	get_lst_pikomino (t_data *data, int player)
 	return (i);
 }
 
-int	get_max_pikomino (t_data *data, int player)
+int	get_max_pikomino (t_data *data, int player) //Renvoie le pikomono max d'un joeur (-1 est le plateau)
 {
 	int	*tab;
 	int	i;
@@ -541,7 +527,7 @@ int	get_max_pikomino (t_data *data, int player)
 	return (res);
 }
 
-int	pop (int *tab)
+int	pop (int *tab) // Supprime le dernier elelemt de la pile
 {
 	int	i;
 	int	res;
@@ -560,7 +546,7 @@ int	pop (int *tab)
 	}
 }
 
-int	pop_elem (int *tab, int val)
+int	pop_elem (int *tab, int val) //Supprime une element dans la pile
 {
 	int	i;
 	int	j;
@@ -581,7 +567,7 @@ int	pop_elem (int *tab, int val)
 	return (-1);
 }
 
-int	push_elem (int *tab, int val)
+int	push_elem (int *tab, int val) //Ajoute une element dans la pile
 {
 	int	i;
 
@@ -597,7 +583,7 @@ int	push_elem (int *tab, int val)
 	return (0);
 }
 
-int	replace_val (int *tab, int val, int replace)
+int	replace_val (int *tab, int val, int replace) //Remplace la valeur dans la pile
 {
 	int	i;
 
@@ -613,7 +599,7 @@ int	replace_val (int *tab, int val, int replace)
 	return (-1);
 }
 
-int	is_val_in (int *tab, int val)
+int	is_val_in (int *tab, int val) // val est dans tab ?
 {
 	int	i;
 
@@ -626,7 +612,7 @@ int	is_val_in (int *tab, int val)
 	return (0);
 }
 
-int	get_joueur_has_val (t_data *data, int val)
+int	get_joueur_has_val (t_data *data, int val) // Donne le joueur qui possede val au sommet de sa pile (test le plateau aussi)
 {
 	int	i;
 
@@ -639,7 +625,7 @@ int	get_joueur_has_val (t_data *data, int val)
 	return (-2);
 }
 
-int	is_table_has_less (t_data *data, int score)
+int	is_table_has_less (t_data *data, int score) //Revoie la valeur inferieur ou egale sur le plateau de jeux (-1 sinon)
 {
 	while (score >= 21)
 	{
@@ -653,7 +639,7 @@ int	is_table_has_less (t_data *data, int score)
 //#GAME#
 //***************************************************************************
 
-int	get_pts(int val)
+int	get_pts(int val) //Points d'un pikomono
 {
 	if (val >= 21 && val <= 24)
 		return (1);
@@ -666,7 +652,7 @@ int	get_pts(int val)
 	return (0);
 }
 
-int	compute_score(int *valeurs)
+int	compute_score(int *valeurs) //Donne le score d'un joueur
 {
 	int	i;
 	int	score = 0;
@@ -680,7 +666,7 @@ int	compute_score(int *valeurs)
 	return (score); 
 }
 
-void	get_new_dice(t_data *data, int nbr_des)
+void	get_new_dice(t_data *data, int nbr_des) //Initialise un nouveau set de des
 {
 	int	i;
 
@@ -689,7 +675,7 @@ void	get_new_dice(t_data *data, int nbr_des)
 		data->des[i] = (rand() % 6) ;
 }
 
-int	can_take_dice(int *valeurs, int *des, int nbr_des)
+int	can_take_dice(int *valeurs, int *des, int nbr_des) //Le joueur peut-il prendre un des ?
 {
 	int	i;
 
@@ -703,7 +689,7 @@ int	can_take_dice(int *valeurs, int *des, int nbr_des)
 		return (1);
 }
 
-int	is_value_in_dice(int *des, int value, int nb_dice)
+int	is_value_in_dice(int *des, int value, int nb_dice) //Value est-elle dans le tableau de des ? 
 {
 	int	i;
 	int	cpt;
@@ -718,7 +704,7 @@ int	is_value_in_dice(int *des, int value, int nb_dice)
 	return (cpt);
 }
 
-int score_des (t_data *data, int player)
+int score_des (t_data *data, int player) //Systeme de lance de des pour le joueur.
 {
 	int i = -1 ;
 	int n = 0;								    	/* Valeur dé que joueur veut garder                                                      		        */
@@ -871,7 +857,7 @@ int score_des_bot (t_data *data, int player)
 		if (n != 0)
 			printf("%d\n", n);
 		else
-			printf("V\n", n);
+			printf("V\n");
 		sleep (2);
     } while (!stop_bot (data, nbr_des, n, valeurs_prises));
 	clearScreen ();
@@ -1125,5 +1111,3 @@ int	main(int argc, char **argv)
 	else 
 		lance_jeux (&data, &player_save);
 	free_data (&data);
-	return (0);
-}
